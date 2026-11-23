@@ -91,6 +91,7 @@ table.chem{border-collapse:collapse;width:100%;font-size:15px}
 table.chem td{border-bottom:1px solid var(--hair);padding:8px 10px 8px 0;vertical-align:top}
 table.chem td:first-child{font-weight:500;white-space:nowrap}
 .warn{border-left:2px solid var(--ink);padding:4px 0 4px 14px}
+.pactions{display:flex;flex-wrap:wrap;gap:10px}
 .pnav{display:flex;justify-content:space-between;border-top:1px solid var(--rule);margin-top:72px;padding-top:14px;font-size:15px}
 .pnav a{text-decoration:none}
 .pnav a:hover{text-decoration:underline}
@@ -197,7 +198,7 @@ footer.site .fnote{flex-basis:100%;margin:8px 0 0;font-size:12px}
   <div class="hero">
     <div>
       <p class="lede">See your photos printed in alternative processes.</p>
-      <p class="intro">Drop in any photo and see it come back in iron, silver, platinum, gum and plant dye. Brush on the emulsion yourself, pick your paper, mock it up on fabric or a vase, then save the print, or the negative you need to make it for real.</p>
+      <p class="intro">Drop in any photo and see it come back in iron, silver, platinum, gum and plant dye. Brush on the emulsion yourself, pick your paper, mock it up on fabric or an object, then save the print, or the negative you need to make it for real.</p>
       <div class="hctl">
         <div class="row2"><span>My image is a</span>
           <div class="seg" role="group" aria-label="Image type" style="width:220px"><button id="hPos" type="button" aria-pressed="true">Photo</button><button id="hNeg" type="button" aria-pressed="false">Negative</button></div>
@@ -571,8 +572,9 @@ function filmTransmission(img, w, h, P, proc){
   for(let i=0,j=0;i<out.length;i++,j+=4){
     const a = d[j+3]/255;
     let L = (0.2126*d[j]+0.7152*d[j+1]+0.0722*d[j+2])/255;
+    L = L*a + (1-a);            // transparent = white in a photo, clear film in a negative
     if(invert) L = 1-L;
-    out[i] = L*a + (1-a);
+    out[i] = L;
   }
   return out;
 }
@@ -809,7 +811,12 @@ function showProcess(id){
         <div class="date">${esc(p.date)}</div>
         <p class="summary">${esc(p.summary)}</p>
         <dl class="facts">${p.facts.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
-        <a class="btn" href="#tool" data-open="${id}">Open in the tool</a>
+        <div class="pactions">
+          <a class="btn" href="#tool" data-open="${id}">Open in the tool</a>
+          <button class="btn ghost" type="button" data-dl="print">Download print</button>
+          <button class="btn ghost" type="button" data-dl="neg">Download digital ${p.needs==="pos" ? "positive" : "negative"}</button>
+        </div>
+        <p class="small" id="pdlStatus" style="margin-top:10px"></p>
       </div>
     </div>
     <div class="pbody">
@@ -819,6 +826,7 @@ function showProcess(id){
     </div>
     <div class="pnav"><a href="#${prev}">← ${esc(PROCESSES[prev].name)}</a><a href="#index">All processes</a><a href="#${next}">${esc(PROCESSES[next].name)} →</a></div>`;
   sec.querySelector("[data-open]").addEventListener("click", ()=>{ setProcess(id); });
+  sec.querySelectorAll("[data-dl]").forEach(b => b.addEventListener("click", ()=> downloadFor(id, b.dataset.dl)));
   setTimeout(()=>{ const c = thumbFor(id, 900); $("plate").appendChild(c); }, 0);
 }
 
@@ -925,6 +933,21 @@ window.addEventListener("drop", e=>{
 });
 
 /* ---------- export ---------- */
+// downloads from a process page: that process's default look, current image
+async function downloadFor(id, kind){
+  const img = srcImg(), [iw,ih] = dimsOf(img);
+  const p = {...defaultsFor(id), input:P.input};
+  const st = $("pdlStatus"); if(st) st.textContent = "Rendering…";
+  await new Promise(r=>setTimeout(r,30));
+  const name = baseName();
+  if(kind === "print"){
+    const L = Math.min(4200, Math.round(Math.max(iw,ih)*(1+2*p.border/100)));
+    await savePNG(toCanvas(renderPrint({img, paperImg, P:p, longEdge:L, seed:7})), `${name}-${id}.png`);
+  } else {
+    await savePNG(toCanvas(renderFilm({img, P:p, longEdge:Math.min(6000, Math.max(iw,ih))})), `${name}-${id}-digital-${PROCESSES[id].needs==="pos"?"positive":"negative"}.png`);
+  }
+  if(st) st.textContent = "";
+}
 const dlMenu = $("dlMenu"), dlTop = $("dlTop");
 const dlOpen = open => { dlMenu.hidden = !open; dlTop.setAttribute("aria-expanded", open); if(open) $("dlPrintItem").focus(); };
 dlTop.onclick = e => { e.stopPropagation(); dlOpen(dlMenu.hidden); };
