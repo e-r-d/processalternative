@@ -160,6 +160,7 @@ select{width:100%;background:var(--paper);color:var(--ink);border:1px solid var(
 #pStatus{font:12px var(--mono);color:var(--grey);min-height:1.4em}
 .drop{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.92);font-size:28px;font-weight:500;border:2px solid var(--ink);margin:16px}
 .drop.on{display:flex}
+.err{color:#b3261e}
 
 /* safety & reading */
 .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:40px;margin-top:8px}
@@ -197,7 +198,7 @@ footer.site .fnote{flex-basis:100%;margin:8px 0 0;font-size:12px}
 <section class="view" id="v-index">
   <div class="hero">
     <div>
-      <p class="lede">See your photos printed in alternative processes.</p>
+      <p class="lede">See your photos printed in real alternative processes.</p>
       <p class="intro">Drop in any photo and see it come back in iron, silver, platinum, gum and plant dye. Brush on the emulsion yourself, pick your paper, mock it up on fabric or an object, then save the print, or the negative you need to make it for real.</p>
       <div class="hctl">
         <div class="row2"><span>My image is a</span>
@@ -910,26 +911,60 @@ $("vObj").onclick = ()=> setView("obj");
 $("vPaint").onclick = ()=> setView("paint");
 
 /* ---------- uploads ---------- */
-function status(msg){ $("pStatus").textContent = msg; }
+function status(msg){
+  $("pStatus").textContent = msg;
+  // also surface on the home page, where the tool status line isn't visible
+  const h = $("hName"); if(h && msg){ h.textContent = msg; h.classList.add("err"); }
+  else if(h) h.classList.remove("err");
+}
+function isImageFile(f){
+  return (f.type && f.type.startsWith("image/")) || /\.(jpe?g|png|gif|webp|avif|bmp|heic|heif|tiff?)$/i.test(f.name||"");
+}
 function loadImageFile(f, cb){
+  const url = URL.createObjectURL(f);
   const im = new Image();
-  im.onload = ()=> cb(im);
-  im.onerror = ()=> status("Couldn't read that image. Browsers often can't open TIFF files; export a PNG or JPG instead.");
-  im.src = URL.createObjectURL(f);
+  im.onload = ()=> { status(""); cb(im); };
+  im.onerror = async ()=> {
+    // some formats decode through createImageBitmap even when <img> refuses
+    try{
+      const bmp = await createImageBitmap(f);
+      const c = document.createElement("canvas"); c.width = bmp.width; c.height = bmp.height;
+      c.getContext("2d").drawImage(bmp, 0, 0);
+      const im2 = new Image(); im2.onload = ()=> { status(""); cb(im2); }; im2.src = c.toDataURL("image/png");
+    }catch(err){
+      const heic = /heic|heif/i.test(f.type + f.name);
+      status(heic ? "This browser can't open HEIC photos. Export it as a JPG (or open the site in Safari) and try again."
+                  : "Couldn't read that image. Try a JPG or PNG.");
+    }
+  };
+  im.src = url;
 }
 $("fImg").addEventListener("change", e=>{ const f=e.target.files[0]; if(f) loadImageFile(f, im=>{ status(""); setUserImage(im, f.name, null); }); });
 $("fPaper").addEventListener("change", e=>{ const f=e.target.files[0]; if(f) loadImageFile(f, im=>{ paperImg=im; $("paperName").textContent=f.name; $("clrPaper").hidden=false; status(""); draw(); }); });
 $("clrPaper").onclick = ()=>{ paperImg=null; $("paperName").textContent="none"; $("clrPaper").hidden=true; $("fPaper").value=""; draw(); };
 $("fModel").addEventListener("change", e=>{ const f=e.target.files[0]; if(f) OBJ.loadModel(f); });
 const drop = $("drop");
-window.addEventListener("dragover", e=>{ e.preventDefault(); drop.classList.add("on"); });
-window.addEventListener("dragleave", e=>{ if(!e.relatedTarget) drop.classList.remove("on"); });
+// Full-screen drop overlay: only for file drags, only off the home page, and it can never get stuck.
+let dragDepth = 0, dragTimer = 0;
+const hasFiles = e => e.dataTransfer && [...(e.dataTransfer.types||[])].includes("Files");
+const onHome = () => !location.hash || location.hash === "#index";
+function dragOff(){ dragDepth = 0; drop.classList.remove("on"); $("dz") && $("dz").classList.remove("over"); }
+function dragPing(){ clearTimeout(dragTimer); dragTimer = setTimeout(dragOff, 250); }
+window.addEventListener("dragenter", e=>{ if(!hasFiles(e)) return; e.preventDefault(); dragDepth++; if(onHome()) $("dz").classList.add("over"); else drop.classList.add("on"); dragPing(); });
+window.addEventListener("dragover", e=>{ if(!hasFiles(e)) return; e.preventDefault(); e.dataTransfer.dropEffect = "copy"; dragPing(); });
+window.addEventListener("dragleave", e=>{ if(!hasFiles(e)) return; dragDepth = Math.max(0, dragDepth-1); if(!dragDepth) dragOff(); });
+["dragend","blur","mousemove","pointerdown","keydown"].forEach(ev=> window.addEventListener(ev, ()=>{ if(drop.classList.contains("on")) dragOff(); }));
 window.addEventListener("drop", e=>{
-  e.preventDefault(); drop.classList.remove("on");
-  const f = e.dataTransfer.files[0]; if(!f) return;
+  e.preventDefault(); clearTimeout(dragTimer); dragOff();
+  const f = e.dataTransfer.files && e.dataTransfer.files[0];
+  if(!f){
+    if(e.dataTransfer.types && [...e.dataTransfer.types].some(t=>/uri|html/.test(t)))
+      status("That came from a web page. Save the image to your computer first, then drop the file here.");
+    return;
+  }
   if(/\.(glb|gltf|obj)$/i.test(f.name)){ if(location.hash !== "#tool") location.hash = "#tool"; setView("obj"); OBJ.loadModel(f); }
-  else if(f.type.startsWith("image/")) loadImageFile(f, im=> setUserImage(im, f.name, (!userImg && location.hash!=="#tool") ? "pos" : null));
-  else status("Drop an image (PNG, JPG) or a 3D model (.glb, .gltf, .obj).");
+  else if(isImageFile(f)) loadImageFile(f, im=> setUserImage(im, f.name, (!userImg && location.hash!=="#tool") ? "pos" : null));
+  else status("Drop an image (JPG, PNG) or a 3D model (.glb, .gltf, .obj).");
 });
 
 /* ---------- export ---------- */
@@ -1139,8 +1174,7 @@ $("hReset").onclick = ()=>{
   PAINT.imageChanged();
   syncHome(); syncUI(); buildIndex(); draw();
 };
-["dragenter","dragover"].forEach(ev=> $("dz").addEventListener(ev, ()=> $("dz").classList.add("over")));
-["dragleave","drop"].forEach(ev=> $("dz").addEventListener(ev, ()=> $("dz").classList.remove("over")));
+
 
 /* ======================= PAINT THE COATING ======================= */
 function paperGeom(img, P, longEdge){
