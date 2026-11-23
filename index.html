@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Process Alternative: a field guide to cyanotype, Van Dyke, salt, platinum/palladium, kallitype, gum and anthotype printing, with a live proofer for your own photos.">
+<title>Process Alternative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+<style>
+/* Layout: museum-site restraint. White ground, black grotesk, hairline rules, large images with small captions. Single light theme by design. */
+:root{
+  --paper:#ffffff;
+  --ink:#111111;
+  --grey:#6f6f6f;
+  --rule:#111111;
+  --hair:#dcdcdc;
+  --wash:#f5f5f3;
+  --sans:"Neue Haas Grotesk Text Pro","NeueHaasGroteskText Pro","NHaasGroteskTXPro-55Rg","Neue Haas Grotesk Display Pro","NeueHaasGroteskDisp Pro","Neue Haas Unica","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink)}
+body{font:17px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img,canvas{max-width:100%}
+header.site{position:sticky;top:0;z-index:20;background:var(--paper);display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding:22px 32px 18px;border-bottom:1px solid var(--rule)}
+.wordmark{font-weight:700;font-size:22px;line-height:1.05;letter-spacing:-.02em;text-decoration:none}
+nav.site{display:flex;gap:28px;flex-wrap:wrap;font-size:15px}
+nav.site a{text-decoration:none;padding-bottom:2px;border-bottom:1px solid transparent}
+nav.site a[aria-current=page],nav.site a:hover{border-bottom-color:var(--ink)}
+section.view{display:none;padding:0 32px 96px}
+section.view.on{display:block}
+h1,h2,h3{font-weight:500;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.lede{font-size:clamp(28px,3.6vw,48px);line-height:1.12;font-weight:500;letter-spacing:-.025em;max-width:22ch;margin:56px 0 18px}
+.intro{max-width:62ch;color:var(--ink);margin:0 0 56px}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:48px;align-items:stretch;margin:48px 0 64px}
+.hero .lede{margin-top:0}
+.hero .intro{margin-bottom:28px}
+.dz{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:380px;border:1px solid var(--ink);background:var(--paper);cursor:pointer;text-align:center;padding:28px;overflow:hidden}
+.dz:hover,.dz.over{background:var(--wash)}
+.dz .plus{font-size:64px;line-height:1;font-weight:300}
+.dz .t{font-size:clamp(24px,2.4vw,34px);font-weight:500;letter-spacing:-.02em}
+.dz .s{font-size:14px;color:var(--grey)}
+.dz img{max-height:300px;max-width:100%;object-fit:contain;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.dz.has .plus{display:none}
+.hctl{display:flex;flex-direction:column;gap:14px;max-width:420px}
+.hctl .row2{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px}
+@media (max-width:900px){.hero{grid-template-columns:1fr}.dz{min-height:260px}}
+.label{font-size:13px;color:var(--grey)}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--rule);padding:12px 0 22px;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:44px 28px}
+.card{display:flex;flex-direction:column;gap:12px;text-decoration:none}
+.card .thumb{background:var(--wash);aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card .thumb canvas{width:100%;height:100%;object-fit:contain}
+.card h3{font-size:20px}
+.card p{margin:2px 0 0;font-size:15px;color:var(--grey)}
+.card:hover h3{text-decoration:underline;text-underline-offset:3px}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border:1px solid var(--ink);border-radius:0;padding:10px 16px;font:500 15px var(--sans);cursor:pointer;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:hover{opacity:.85}
+:focus-visible{outline:2px solid #1f5bd8;outline-offset:2px}
+
+/* process page */
+.phead{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:48px;margin-top:40px;align-items:start}
+.phead .plate{background:var(--wash);display:flex;align-items:center;justify-content:center;padding:28px}
+.phead .plate canvas{max-height:72vh;width:auto;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.phead h1{font-size:clamp(40px,5vw,72px);line-height:1;margin:0 0 10px}
+.phead .date{font-size:15px;color:var(--grey);margin-bottom:28px}
+.phead .summary{font-size:20px;line-height:1.4;margin:0 0 28px;max-width:40ch}
+dl.facts{display:grid;grid-template-columns:150px 1fr;margin:0 0 28px;border-top:1px solid var(--rule)}
+dl.facts dt,dl.facts dd{padding:9px 0;border-bottom:1px solid var(--hair);margin:0;font-size:15px}
+dl.facts dt{color:var(--grey)}
+.pbody{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;margin-top:64px}
+.pbody h2{font-size:15px;font-weight:600;border-top:1px solid var(--rule);padding-top:12px;margin-bottom:16px}
+.pbody p,.pbody li{font-size:16px;max-width:62ch}
+.pbody ol{padding-left:1.3em;margin:0;display:flex;flex-direction:column;gap:10px}
+table.chem{border-collapse:collapse;width:100%;font-size:15px}
+table.chem td{border-bottom:1px solid var(--hair);padding:8px 10px 8px 0;vertical-align:top}
+table.chem td:first-child{font-weight:500;white-space:nowrap}
+.warn{border-left:2px solid var(--ink);padding:4px 0 4px 14px}
+.pnav{display:flex;justify-content:space-between;border-top:1px solid var(--rule);margin-top:72px;padding-top:14px;font-size:15px}
+.pnav a{text-decoration:none}
+.pnav a:hover{text-decoration:underline}
+
+/* proofer */
+#v-tool{padding:0}
+.negs{padding:72px 32px 24px;border-top:1px solid var(--rule)}
+.negs .lede{margin-top:0}
+footer .reading{display:flex;flex-direction:column;gap:6px;max-width:62ch}
+footer .reading b{color:var(--ink);font-weight:500}
+.pf{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 80px)}
+.pf aside{border-right:1px solid var(--rule);padding:22px 24px 40px;display:flex;flex-direction:column;gap:22px;overflow-y:auto;max-height:calc(100vh - 80px);position:sticky;top:80px}
+.pf h1{font-size:30px;line-height:1.05}
+.grp{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--rule);padding-top:10px}
+.grp>.gt{font-size:13px;font-weight:600}
+.ctl{display:flex;flex-direction:column;gap:4px}
+.ctl label{display:flex;justify-content:space-between;font-size:14px}
+.ctl output{font:12px var(--mono);color:var(--grey);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--ink);margin:0}
+select{width:100%;background:var(--paper);color:var(--ink);border:1px solid var(--ink);border-radius:0;padding:7px 8px;font:14px var(--sans)}
+.check{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
+.check input{accent-color:var(--ink);margin:0;width:15px;height:15px}
+.seg{display:flex;border:1px solid var(--ink)}
+.seg button{flex:1;background:var(--paper);color:var(--ink);border:0;border-right:1px solid var(--ink);padding:7px 6px;font:14px var(--sans);cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.procs{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--ink);border-left:1px solid var(--ink)}
+.procs button{background:var(--paper);border:0;border-right:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:8px 8px;text-align:left;font:14px var(--sans);cursor:pointer}
+.procs button[aria-pressed=true]{background:var(--ink);color:#fff}
+.upl{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px}
+.upl .name{color:var(--grey);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+.small{font-size:13px;color:var(--grey);margin:0}
+.linkbtn{background:none;border:0;padding:0;font:13px var(--sans);text-decoration:underline;cursor:pointer;color:var(--ink)}
+.stage{display:flex;flex-direction:column;min-width:0}
+.stagebar{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 28px;border-bottom:1px solid var(--hair);flex-wrap:wrap}
+.stagebar .meta{font:12px var(--mono);color:var(--grey);flex:1 1 240px;text-align:right}
+.stagebar .seg{flex:0 1 470px}
+.easel{flex:1;display:flex;align-items:center;justify-content:center;padding:36px;min-height:560px;position:relative}
+#pCanvas{max-height:calc(100vh - 220px);filter:drop-shadow(0 2px 3px rgba(0,0,0,.14)) drop-shadow(0 12px 24px rgba(0,0,0,.10))}
+#objWrap{position:absolute;inset:0;display:none}
+#paintWrap{display:none;flex-direction:column;width:100%;align-self:stretch}
+.easel.painting{padding:0;align-items:stretch}
+#paintWrap .pstage{flex:1;display:flex;align-items:center;justify-content:center;padding:28px 36px 8px;min-height:0}
+#paintCanvas{max-width:100%;max-height:min(calc(100vh - 300px),75vh);width:auto;height:auto;touch-action:none;cursor:crosshair;filter:drop-shadow(0 2px 3px rgba(0,0,0,.14)) drop-shadow(0 12px 24px rgba(0,0,0,.10))}
+.paintbar{display:flex;flex-wrap:wrap;gap:14px 18px;align-items:center;padding:12px 28px 18px;border-top:1px solid var(--hair);background:var(--paper)}
+.paintbar .ctl{min-width:140px}
+.paintbar .seg{min-width:260px}
+.paintbar .hint{font-size:13px;color:var(--grey);flex-basis:100%}
+#objWrap canvas{display:block}
+.objbar{position:absolute;left:28px;bottom:22px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;z-index:2}
+.objbar .seg{background:var(--paper)}
+.objnote{position:absolute;right:28px;bottom:26px;font-size:13px;color:var(--grey)}
+#pStatus{font:12px var(--mono);color:var(--grey);min-height:1.4em}
+.drop{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.92);font-size:28px;font-weight:500;border:2px solid var(--ink);margin:16px}
+.drop.on{display:flex}
+
+/* safety & reading */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:40px;margin-top:8px}
+.cols h3{font-size:18px;border-top:1px solid var(--rule);padding-top:10px;margin-bottom:8px}
+.cols p{margin:0;font-size:16px;max-width:60ch}
+footer.site{border-top:1px solid var(--rule);padding:16px 32px 40px;font-size:13px;color:var(--grey);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+
+@media (max-width:900px){
+  .phead{grid-template-columns:1fr}
+  .pf{grid-template-columns:1fr}
+  .pf aside{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--rule);order:2}
+  .stage{order:1}
+  .easel{min-height:420px;padding:20px}
+  header.site{padding:16px;flex-direction:column;gap:12px}
+  section.view{padding:0 16px 72px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="site">
+  <a class="wordmark" href="#index">Process<br>Alternative</a>
+  <nav class="site" aria-label="Main">
+    <a href="#index" data-nav="index">Processes</a>
+    <a href="#tool" data-nav="tool">Tool</a>
+  </nav>
+</header>
+
+<!-- INDEX -->
+<section class="view" id="v-index">
+  <div class="hero">
+    <div>
+      <p class="lede">See your photo printed in iron, silver, platinum, gum and plants.</p>
+      <p class="intro">Upload a photo or a digital negative. Every process below re-renders from your image, so you can compare cyanotype, platinum, salt and more side by side, then open any one for its chemistry and steps, or fine-tune it in the tool.</p>
+      <div class="hctl">
+        <div class="row2"><span>My image is a</span>
+          <div class="seg" role="group" aria-label="Image type" style="width:220px"><button id="hPos" type="button" aria-pressed="true">Photo</button><button id="hNeg" type="button" aria-pressed="false">Negative</button></div>
+        </div>
+        <div class="row2"><span class="label" id="hName">Showing the example photo</span><button class="linkbtn" id="hReset" type="button" hidden>Use the example instead</button></div>
+      </div>
+    </div>
+    <label class="dz" id="dz" for="hImg">
+      <span class="plus" aria-hidden="true">+</span>
+      <span class="t" id="dzT">Upload a photo</span>
+      <span class="s" id="dzS">JPG or PNG · click or drop it here</span>
+      <input id="hImg" type="file" accept="image/*" hidden>
+    </label>
+  </div>
+  <div class="sechead"><span>Processes</span><span class="label" id="procCount"></span></div>
+  <div class="grid" id="procGrid"></div>
+</section>
+
+<!-- PROCESS (filled by script) -->
+<section class="view" id="v-process"></section>
+
+<!-- PROOFER -->
+<section class="view" id="v-tool">
+  <div class="pf">
+    <aside>
+      <div>
+        <h1>Tool</h1>
+        <p class="small" style="margin-top:8px">Simulates a contact print from your negative. A preview for judging a negative, not a prediction of exposure times.</p>
+      </div>
+
+      <div class="grp">
+        <div class="gt">Process</div>
+        <div class="procs" id="procBtns" role="group" aria-label="Process"></div>
+        <div class="ctl"><label for="variant" id="variantLabel">Tone</label><select id="variant"></select></div>
+      </div>
+
+      <div class="grp">
+        <div class="gt">Your files</div>
+        <div class="upl"><span>Image <span class="name" id="imgName">example photo</span></span><label class="btn ghost" style="padding:6px 10px;font-size:13px">Upload<input id="fImg" type="file" accept="image/*" hidden></label></div>
+        <div class="ctl"><label>Image is a</label>
+          <div class="seg" role="group" aria-label="Image type"><button id="inNeg" type="button" aria-pressed="false">Negative</button><button id="inPos" type="button" aria-pressed="true">Positive</button></div>
+        </div>
+        <div class="upl"><span>Paper scan <span class="name" id="paperName">none</span></span><span style="display:flex;gap:10px;align-items:center"><button class="linkbtn" id="clrPaper" type="button" hidden>Remove</button><label class="btn ghost" style="padding:6px 10px;font-size:13px">Upload<input id="fPaper" type="file" accept="image/*" hidden></label></span></div>
+        <p class="small">Scan a blank sheet of your paper (or fabric) at the same orientation. The emulsion is laid into its texture and tone.</p>
+        <label class="check"><input id="flip" type="checkbox"> Flip horizontally</label>
+        <label class="check"><input id="exposeBorder" type="checkbox" checked> Expose the coated border</label>
+      </div>
+
+      <div class="grp">
+        <div class="gt">Exposure</div>
+        <div class="ctl"><label for="exposure">Exposure <output id="exposureV"></output></label><input id="exposure" type="range" min="-2.5" max="2.5" step="0.1"></div>
+        <div class="ctl"><label for="contrast">Negative contrast <output id="contrastV"></output></label><input id="contrast" type="range" min="0.4" max="2.6" step="0.05"></div>
+        <div class="ctl"><label for="soft">Contact softness <output id="softV"></output></label><input id="soft" type="range" min="0" max="6" step="0.1"></div>
+        <div class="ctl"><label for="fog">Highlight fog <output id="fogV"></output></label><input id="fog" type="range" min="0" max="0.3" step="0.01"></div>
+        <div class="ctl" id="bronzeCtl"><label for="bronze">Shadow bronzing <output id="bronzeV"></output></label><input id="bronze" type="range" min="0" max="1" step="0.05"></div>
+      </div>
+
+      <div class="grp">
+        <div class="gt">Paper &amp; coating</div>
+        <div class="ctl"><label for="paper">Paper</label>
+          <select id="paper"></select>
+        </div>
+        <div class="ctl"><label for="edge">Edge</label>
+          <select id="edge"><option value="cut">Straight cut</option><option value="deckle">Deckled</option><option value="torn">Torn by hand</option></select>
+        </div>
+        <div class="ctl"><label for="border">Paper margin <output id="borderV"></output></label><input id="border" type="range" min="0" max="35" step="1"></div>
+        <div class="ctl"><label for="coat">Coating past the negative <output id="coatV"></output></label><input id="coat" type="range" min="0" max="100" step="1"></div>
+        <div class="ctl"><label>Coating</label><div class="seg" role="group" aria-label="Coating"><button id="cAuto" type="button" aria-pressed="true">Auto brush</button><button id="cPaint" type="button" aria-pressed="false">Painted by hand</button></div></div>
+        <div class="ctl"><label>Brush direction</label><div class="seg" role="group" aria-label="Brush direction"><button id="dirH" type="button" aria-pressed="true">Horizontal</button><button id="dirV" type="button" aria-pressed="false">Vertical</button></div></div>
+        <div class="ctl"><label for="rough">Brush edge roughness <output id="roughV"></output></label><input id="rough" type="range" min="0" max="2" step="0.05"></div>
+        <div class="ctl"><label for="uneven">Uneven coating <output id="unevenV"></output></label><input id="uneven" type="range" min="0" max="1" step="0.05"></div>
+        <div class="ctl"><label for="tex">Paper texture <output id="texV"></output></label><input id="tex" type="range" min="0" max="1" step="0.05"></div>
+        <div class="ctl"><label for="speck">Bubbles &amp; specks <output id="speckV"></output></label><input id="speck" type="range" min="0" max="1" step="0.05"></div>
+        <button class="btn ghost" id="reroll" type="button" style="justify-content:center">New brush pass</button>
+      </div>
+
+      <div class="grp">
+        <div class="gt">Export</div>
+        <button class="btn" id="savePrint" type="button" style="justify-content:center">Save print (PNG)</button>
+        <button class="btn ghost" id="saveNeg" type="button" style="justify-content:center">Save digital negative (PNG)</button>
+        <p class="small">The digital negative includes your contrast setting and flip, ready to print on transparency film.</p>
+        <button class="linkbtn" id="reset" type="button" style="align-self:flex-start">Reset this process</button>
+        <div id="pStatus" role="status"></div>
+      </div>
+    </aside>
+
+    <div class="stage">
+      <div class="stagebar">
+        <div class="seg" role="group" aria-label="View"><button id="vPaint" type="button" aria-pressed="false">Paint coating</button><button id="vPrint" type="button" aria-pressed="true">Print</button><button id="vNeg" type="button" aria-pressed="false">Negative</button><button id="vObj" type="button" aria-pressed="false">On object</button></div>
+        <div class="meta" id="pMeta"></div>
+      </div>
+      <div class="easel" id="easel">
+        <canvas id="pCanvas" aria-label="Simulated print"></canvas>
+        <div id="paintWrap">
+          <div class="pstage"><canvas id="paintCanvas" aria-label="Paint the sensitizer onto the paper"></canvas></div>
+          <div class="paintbar">
+            <div class="seg" role="group" aria-label="Brush"><button id="bFlat" type="button" aria-pressed="true">Hake</button><button id="bRound" type="button" aria-pressed="false">Round</button><button id="bErase" type="button" aria-pressed="false">Eraser</button></div>
+            <div class="ctl"><label for="bSize">Size <output id="bSizeV"></output></label><input id="bSize" type="range" min="6" max="260" step="1" value="110"></div>
+            <div class="ctl"><label for="bLoad">Paint load <output id="bLoadV"></output></label><input id="bLoad" type="range" min="0.1" max="1" step="0.05" value="0.6"></div>
+            <div class="ctl"><label for="bFlow">Flow <output id="bFlowV"></output></label><input id="bFlow" type="range" min="0.1" max="1" step="0.05" value="0.8"></div>
+            <button class="btn ghost" id="bUndo" type="button">Undo</button>
+            <button class="btn ghost" id="bClear" type="button">Clear</button>
+            <button class="btn" id="bExpose" type="button">Expose →</button>
+            <p class="hint">Brush the sensitizer onto the paper, then expose. The faint image shows where your negative will sit. Lower paint load makes the brush run dry sooner for broken, streaky ends.</p>
+          </div>
+        </div>
+        <div id="objWrap">
+          <div class="objbar">
+            <div class="seg" role="group" aria-label="Object" id="objSeg">
+              <button type="button" data-obj="sheet" aria-pressed="true">Sheet</button>
+              <button type="button" data-obj="fabric" aria-pressed="false">Fabric</button>
+              <button type="button" data-obj="vase" aria-pressed="false">Vessel</button>
+              <button type="button" data-obj="sphere" aria-pressed="false">Sphere</button>
+              <button type="button" data-obj="box" aria-pressed="false">Block</button>
+            </div>
+            <label class="btn ghost" style="padding:6px 10px;font-size:13px;background:#fff">Upload 3D model (.glb, .gltf, .obj)<input id="fModel" type="file" accept=".glb,.gltf,.obj" hidden></label>
+          </div>
+          <div class="objnote" id="objNote">Drag to orbit · scroll to zoom</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="negs" id="negs">
+  <p class="lede">Making a digital negative.</p>
+  <p class="intro">Contact processes print at the size of the negative, so most people now make negatives on an inkjet printer. The tool's "Save digital negative" button does the first three steps for you.</p>
+  <div class="cols">
+    <div><h3>1. Convert and size</h3><p>Convert the image to greyscale and size it to the final print. Contact printing has no enlargement: an 8×10 in print needs an 8×10 in negative.</p></div>
+    <div><h3>2. Invert</h3><p>Invert the image so shadows become clear film. Anthotypes are the exception: they bleach where light hits, so they print from a positive.</p></div>
+    <div><h3>3. Flip</h3><p>Flip the image horizontally if you print emulsion side down, so the ink side touches the coated paper. This keeps the print sharp.</p></div>
+    <div><h3>4. Shape the curve</h3><p>Each process has a different tonal range. Iron processes are short (cyanotype, about 1.5–2.0 log density range); salt and platinum are long (2.0–2.4); gum is very short per layer (about 1.0). Print a step tablet, read where tones block up or wash out, and build a correction curve.</p></div>
+    <div><h3>5. Print on film</h3><p>Print on inkjet transparency film made for negatives at the printer's highest quality, using black ink, or a colorized negative if your curve needs more UV density.</p></div>
+    <div><h3>6. Test</h3><p>Make a test strip, exposing sections for increasing times. The right time is the shortest one that gives a full shadow through clear film.</p></div>
+  </div>
+  </div>
+</section>
+
+
+<footer class="site">
+  <div class="reading"><b>Reading</b><span><em>The Book of Alternative Photographic Processes</em>, Christopher James. The standard reference, with formulas and history for nearly every process here.</span></div>
+  <div class="reading" style="text-align:right"><b>Process Alternative</b><span>Formulas are common starting points. Test on your own paper.</span></div>
+</footer>
+
+<div class="drop" id="drop">Drop a photo, negative or 3D model</div>
+
+<script>
+const EXAMPLE = "example.webp";
+const $ = id => document.getElementById(id);
+
+/* ======================= PROCESS DATA ======================= */
+// paper stocks: base color and surface texture
+const PAPERS = {
+  natural:{label:"Natural cotton rag", rgb:[244,240,229], tex:"rag"},
+  bright:{label:"Bright white watercolor", rgb:[250,250,247], tex:"rag"},
+  cold:{label:"Cold-press watercolor", rgb:[246,243,234], tex:"cold"},
+  warm:{label:"Warm cream", rgb:[240,229,206], tex:"rag"},
+  japanese:{label:"Japanese gampi", rgb:[238,230,212], tex:"gampi"},
+  book:{label:"Old book page", rgb:[230,214,178], tex:"book"},
+  kraft:{label:"Kraft paper", rgb:[196,156,108], tex:"kraft"},
+  cardboard:{label:"Corrugated cardboard", rgb:[178,138,94], tex:"corrugated"},
+  sky:{label:"Colored: pale blue", rgb:[184,204,218], tex:"rag"},
+  rose:{label:"Colored: rose", rgb:[228,190,186], tex:"rag"},
+  ochre:{label:"Colored: ochre", rgb:[222,190,120], tex:"rag"},
+  grey:{label:"Colored: stone grey", rgb:[186,184,178], tex:"rag"},
+  muslin:{label:"Fabric: cotton muslin", rgb:[238,231,214], tex:"weave"},
+  linen:{label:"Fabric: natural linen", rgb:[212,200,176], tex:"linen"}
+};
+const REF = [244,240,229];
+function surface(kind, nx, ny, s, amt){
+  const fib = (0.55*vnoise(nx*1.4,ny*1.4,s+41) + 0.3*vnoise(nx*0.35,ny*0.35,s+42) + 0.15*vnoise(nx*4.2,ny*4.2,s+43)) - 0.5;
+  switch(kind){
+    case "cold": return 1 + amt*((fbm(nx*0.22, ny*0.22, s+44, 3)-0.5)*0.26 + fib*0.08);
+    case "gampi": return 1 + amt*((vnoise(nx*0.06, ny*1.3, s+45)-0.5)*0.10 + (vnoise(nx*1.2, ny*0.07, s+46)-0.5)*0.08 + fib*0.06);
+    case "book": { const fox = smooth(0.8, 0.9, vnoise(nx*0.09, ny*0.09, s+47)); return (1 + amt*fib*0.12) * (1 - 0.22*fox*amt); }
+    case "kraft": { const spk = vnoise(nx*2.3, ny*2.3, s+48) > 0.93 ? -0.25 : 0; return 1 + amt*(fib*0.22 + spk + (vnoise(nx*0.05, ny*0.6, s+49)-0.5)*0.06); }
+    case "corrugated": { const fl = Math.sin(ny*0.38); return 1 + amt*(0.09*fl + fib*0.12); }
+    case "weave": { const w = Math.sin(nx*1.6)*0.5 + Math.sin(ny*1.6)*0.5; return 1 + amt*(0.10*w*Math.sign(Math.sin(nx*0.8)*Math.sin(ny*0.8)) + fib*0.08); }
+    case "linen": { const w = Math.sin(nx*1.1 + vnoise(ny*0.3,1,s)*2)*0.5 + Math.sin(ny*1.0 + vnoise(nx*0.3,2,s)*2)*0.5; const slub = (vnoise(nx*0.04, ny*0.9, s+50)-0.5)*0.12; return 1 + amt*(0.11*w + slub + fib*0.08); }
+    default: return 1 + amt*fib*0.16;
+  }
+}
+
+const PROCESSES = {
+  cyanotype:{
+    sens:[196,200,78], name:"Cyanotype", date:"1842 · Sir John Herschel", needs:"neg", k:1.8, gamma:1.6, dmax:1, bronze:true, grain:0,
+    short:"Iron salts and UV make Prussian blue. The easiest start.",
+    variantLabel:"Tone",
+    variants:{
+      classic:{label:"Classic", mid:[38,92,168], deep:[14,40,98], bronze:[52,62,70]},
+      ware:{label:"New cyanotype (Ware)", mid:[34,74,170], deep:[16,26,88], bronze:[46,44,70]},
+      bleached:{label:"Bleached in soda", mid:[118,160,206], deep:[66,108,170], bronze:[86,110,140]},
+      tea:{label:"Tea toned", mid:[104,104,118], deep:[52,48,66], bronze:[70,58,52], paperMul:[0.93,0.86,0.72]},
+      tannin:{label:"Tannic acid, near black", mid:[84,86,96], deep:[30,30,38], bronze:[46,40,36], paperMul:[0.95,0.9,0.8]},
+      wine:{label:"Red wine toned", mid:[104,82,118], deep:[52,34,66], bronze:[66,44,54], paperMul:[0.96,0.9,0.88]}
+    },
+    summary:"Paper coated with two iron salts turns blue where UV light reaches it. Water develops the print, and there's no fixer. Cheap, forgiving and low-toxicity.",
+    facts:[["Image color","Prussian blue, toned to brown or black"],["Light","UV: sun or a UV exposure unit"],["Exposure","10–20 min UV unit, 5–15 min summer sun"],["Negative","Log density range about 1.5–2.0"],["Cost","Low"],["Difficulty","Beginner"],["Permanence","Good; fades in alkaline conditions, often recovers in the dark"]],
+    chem:[["Solution A","25 g ferric ammonium citrate (green) in 100 ml distilled water"],["Solution B","10 g potassium ferricyanide in 100 ml distilled water"],["Working","Mix A and B 1:1 just before coating; about 2 ml covers 8×10 in"]],
+    steps:["In dim tungsten light, mix equal parts A and B.","Coat unbuffered paper evenly with a hake brush or glass rod. Dry flat in the dark.","Contact print the negative under glass until shadows turn grey-bronze and look reversed.","Wash in running water for 5–10 minutes until the highlights are clean white.","Optional: a few drops of 3% hydrogen peroxide in the wash brings up the full blue immediately.","Dry. The blue keeps deepening for about a day."],
+    notes:"Use unbuffered paper: calcium carbonate buffering bleaches the blue. Mix in tea or tannic acid after a light bleach in washing soda to get browns and blacks. Ware's new cyanotype (ferric ammonium oxalate) is faster and stays on the paper surface for crisper detail.",
+    safety:"Low toxicity. Never heat potassium ferricyanide or mix it with strong acid."
+  },
+  vandyke:{
+    sens:[200,168,98], name:"Van Dyke brown", date:"1889 · Arndt & Troost", needs:"neg", k:1.6, gamma:1.45, dmax:1, grain:0,
+    short:"Iron and silver for rich chocolate browns.",
+    variantLabel:"Tone",
+    variants:{
+      untoned:{label:"Untoned", mid:[150,98,62], deep:[56,32,18]},
+      gold:{label:"Gold toned", mid:[128,108,98], deep:[44,34,32]},
+      selenium:{label:"Selenium toned", mid:[132,92,76], deep:[46,26,24]}
+    },
+    summary:"An iron-silver process named for the brown of Van Dyck's paintings. The image prints out (you can see it forming), and darkens on drying.",
+    facts:[["Image color","Warm to deep brown"],["Light","UV"],["Exposure","5–15 min UV unit"],["Negative","Log density range about 1.8–2.0"],["Cost","Low to medium"],["Difficulty","Beginner–intermediate"],["Permanence","Good if fixed and washed thoroughly; better when gold toned"]],
+    chem:[["A","9 g ferric ammonium citrate in 33 ml distilled water"],["B","1.5 g tartaric acid in 33 ml distilled water"],["C","3.8 g silver nitrate in 33 ml distilled water"],["Fixer","3% sodium thiosulfate (hypo)"]],
+    steps:["Mix A into B, then add C slowly while stirring. Store in a brown bottle and let it age a few days.","Coat once or twice and dry in the dark.","Expose until the shadows look dark brown and slightly reversed.","Wash in water for about 5 minutes, until the yellow runoff stops.","Fix for 1 minute in 3% hypo. The print drops in density and turns brown.","Wash for 20–30 minutes (a hypo clearing bath shortens this) and dry. It darkens as it dries."],
+    notes:"Too much fixer or fixing too long bleaches the image. Humidity in the paper during exposure gives deeper shadows. Gold toning before fixing cools the color and improves permanence.",
+    safety:"Silver nitrate is corrosive and stains skin black. Wear gloves and eye protection."
+  },
+  salt:{
+    sens:[226,224,214], name:"Salt print", date:"1841 · William Henry Fox Talbot", needs:"neg", k:1.35, gamma:1.3, dmax:0.97, grain:0,
+    short:"The first negative–positive process. Matte, reddish brown.",
+    variantLabel:"Tone",
+    variants:{
+      untoned:{label:"Untoned", mid:[176,118,96], deep:[86,42,34]},
+      gold:{label:"Gold toned", mid:[146,118,118], deep:[54,40,46]},
+      platinum:{label:"Platinum toned", mid:[146,128,116], deep:[48,40,36]}
+    },
+    summary:"Paper salted with sodium chloride and sensitized with silver nitrate forms silver chloride, which prints out in UV. The image sits in the paper fibres, giving a soft, matte surface.",
+    facts:[["Image color","Reddish brown; purple-grey when gold toned"],["Light","UV"],["Exposure","10–30 min UV unit"],["Negative","High contrast, log density range about 2.0–2.4"],["Cost","Medium"],["Difficulty","Intermediate"],["Permanence","Fragile untoned; good when gold toned"]],
+    chem:[["Salting","2% sodium chloride with 2% gelatin in warm water"],["Sensitizer","12% silver nitrate (12 g per 100 ml distilled water)"],["Fixer","Two baths of 10% sodium thiosulfate with a pinch of sodium carbonate"]],
+    steps:["Salt the paper by brushing or floating, then dry.","In dim light, brush on the silver nitrate and dry in the dark.","Expose until the image is noticeably darker than you want. Fixing lightens it.","Wash in water with a pinch of salt for 5 minutes, until the milky runoff stops.","Optional: gold tone for color and permanence.","Fix in two baths of 10% hypo, about 4 minutes each, then wash for 30 minutes."],
+    notes:"Sizing (gelatin, arrowroot) keeps the image near the surface for richer blacks. Salt prints need longer-range negatives than iron processes.",
+    safety:"Silver nitrate is corrosive and stains skin. Wear gloves and eye protection."
+  },
+  platinum:{
+    sens:[226,208,120], name:"Platinum / palladium", btn:"Pt / Pd", date:"1873 · William Willis", needs:"neg", k:1.2, gamma:1.25, dmax:0.97, grain:0,
+    short:"Noble metals in the paper fibre. Long tonal scale, archival.",
+    variantLabel:"Metal",
+    variants:{
+      palladium:{label:"Palladium (warm)", mid:[168,140,112], deep:[58,44,34]},
+      mix:{label:"50/50 platinum–palladium", mid:[156,142,126], deep:[46,40,35]},
+      platinum:{label:"Platinum (neutral)", mid:[146,140,132], deep:[36,34,33]}
+    },
+    summary:"Ferric oxalate and platinum or palladium salts coat the paper. UV reduces the iron, and a developer turns it into metallic platinum or palladium embedded in the fibres: among the most permanent images in photography.",
+    facts:[["Image color","Neutral grey-black (Pt) to warm brown (Pd)"],["Light","UV"],["Exposure","3–10 min UV unit"],["Negative","Log density range about 1.5–2.4, adjusted with contrast agents"],["Cost","High"],["Difficulty","Intermediate–advanced"],["Permanence","Excellent; archival for centuries"]],
+    chem:[["Solution 1","Ferric oxalate, about 27%"],["Solution 2","Ferric oxalate with potassium chlorate (contrast)"],["Metal","15% sodium chloropalladate and/or 20% potassium chloroplatinite"],["8×10 in","About 24 drops total: 12 ferric oxalate (1 + 2 for contrast) + 12 metal"],["Developer","Potassium oxalate (warm) or ammonium citrate (cooler)"],["Clearing","Three baths of dilute EDTA or citric acid, about 5 min each"]],
+    steps:["Count the drops into a shot glass in dim light: ferric oxalate first, then metal.","Coat quickly with a glass rod or brush and dry in the dark.","Expose until a faint orange-brown image appears.","Develop for 1–2 minutes. The full image appears instantly.","Clear in three baths to remove the iron, then wash for 20 minutes and dry."],
+    notes:"More of solution 2 increases contrast. Sodium chloroplatinate (Na2) is the common contrast agent for palladium. Paper choice matters more than in any other process: try Arches Platine or Hahnemühle Platinum Rag.",
+    safety:"Oxalates are poisonous if swallowed. Platinum salts can cause allergic sensitization. Potassium chlorate is an oxidizer."
+  },
+  kallitype:{
+    sens:[218,196,118], name:"Kallitype", date:"1889 · W. W. J. Nicol", needs:"neg", k:1.5, gamma:1.4, dmax:1, grain:0,
+    short:"Silver's answer to platinum. Developer sets the color.",
+    variantLabel:"Developer",
+    variants:{
+      sepia:{label:"Rochelle salt (sepia)", mid:[156,108,76], deep:[60,36,24]},
+      brown:{label:"Sodium acetate (brown)", mid:[140,108,88], deep:[48,34,28]},
+      neutral:{label:"Borax (neutral black)", mid:[130,124,118], deep:[34,30,28]}
+    },
+    summary:"Like platinum, a ferric oxalate sensitizer is reduced by UV, but the image is made in silver. With the developer you can choose a color from sepia to neutral black.",
+    facts:[["Image color","Sepia, brown or neutral black"],["Light","UV"],["Exposure","3–10 min UV unit"],["Negative","Log density range about 1.8"],["Cost","Medium"],["Difficulty","Intermediate"],["Permanence","Good when fixed well; better toned"]],
+    chem:[["Sensitizer","Equal parts 20% ferric oxalate and 9% silver nitrate"],["Developer","Rochelle salt, sodium acetate or borax solution"],["Clear","3% citric acid"],["Fixer","2–5% sodium thiosulfate"]],
+    steps:["Mix the sensitizer and coat; dry in the dark.","Expose until a faint image prints out.","Develop for 1–2 minutes in your chosen developer.","Clear in dilute citric acid.","Fix for 5 minutes, then wash for 20–30 minutes."],
+    notes:"Kallitypes are easy to tone with gold, platinum or palladium for permanence and color.",
+    safety:"Silver nitrate is corrosive; oxalates are poisonous if swallowed."
+  },
+  gum:{
+    name:"Gum bichromate", date:"1855 · Alphonse Poitevin", needs:"neg", k:1.7, gamma:1.05, dmax:0.82, grain:1,
+    short:"Painterly layers of pigment in gum arabic. Any color.",
+    variantLabel:"Pigment",
+    variants:{
+      ultramarine:{label:"Ultramarine blue", pig:[44,58,150]},
+      sienna:{label:"Burnt sienna", pig:[138,70,42]},
+      lamp:{label:"Lamp black", pig:[34,34,36]},
+      quin:{label:"Quinacridone rose", pig:[176,38,88]},
+      phthalo:{label:"Phthalo green", pig:[16,104,84]},
+      ochre:{label:"Yellow ochre", pig:[196,150,58]}
+    },
+    summary:"Gum arabic mixed with pigment and a dichromate hardens where UV hits it. Unexposed gum washes away in water. Prints are built up layer by layer, often in different colors.",
+    facts:[["Image color","Any watercolor pigment"],["Light","UV"],["Exposure","2–6 min per layer"],["Negative","Short, log density range about 1.0–1.2 per layer"],["Cost","Low"],["Difficulty","Advanced"],["Permanence","Excellent; pigment-based"]],
+    chem:[["Gum","Gum arabic, 14° Baumé"],["Pigment","Tube watercolor, a few cm per 10 ml gum"],["Sensitizer","Ammonium or potassium dichromate, about 13%"],["Mix","Equal parts gum-pigment and sensitizer"]],
+    steps:["Size the paper (gelatin or acrylic) so pigment doesn't stain the highlights.","Brush on a thin, even layer of the gum-pigment-dichromate mix and dry in the dark.","Expose. Layers are thin, so the tonal scale per layer is short.","Float face down in still water for 20–60 minutes while unhardened gum releases.","Dry, register the negative again and repeat with more layers or colors."],
+    notes:"Three-color gum uses separation negatives for each layer. Thin coats give better detail; brushing during development lifts highlights.",
+    safety:"Dichromates are toxic, carcinogenic and hazardous waste. Wear gloves and never pour them down the drain. DAS is a less toxic sensitizer."
+  },
+  anthotype:{
+    name:"Anthotype", date:"1842 · Mary Somerville, John Herschel", needs:"pos", k:1.25, gamma:1.1, dmax:0.72, grain:0.5,
+    short:"Plant juice bleached by the sun. Prints from a positive.",
+    variantLabel:"Plant",
+    variants:{
+      turmeric:{label:"Turmeric", pig:[214,160,28]},
+      spinach:{label:"Spinach", pig:[96,124,56]},
+      blackberry:{label:"Blackberry", pig:[108,52,98]},
+      cabbage:{label:"Red cabbage", pig:[96,78,140]},
+      beet:{label:"Beetroot", pig:[150,40,70]}
+    },
+    summary:"Pigment pressed from plants fades in sunlight. Place a positive on the dyed paper, and the light areas bleach while the shadows keep their color. Exposures take days.",
+    facts:[["Image color","The plant's own color"],["Light","Direct sun"],["Exposure","Hours (turmeric) to weeks (berries)"],["Negative","Uses a positive"],["Cost","Almost free"],["Difficulty","Beginner; requires patience"],["Permanence","Fugitive; store in the dark"]],
+    chem:[["Emulsion","Crushed plant material with a little water or alcohol, strained through cloth"],["Coating","2–3 coats, dried between"],["Fixing","None"]],
+    steps:["Crush or blend the plant with a little alcohol or water and strain.","Coat the paper 2–3 times, drying in the dark between coats.","Place a positive on the paper under glass, in a contact frame.","Leave in direct sun until the open areas bleach: from a few hours to several weeks.","Display briefly and store in the dark, since the image keeps fading."],
+    notes:"Turmeric is fastest. Alkaline washes shift some dyes: turmeric turns red-brown in borax, red cabbage turns green.",
+    safety:"Generally safe. Alcohol is flammable."
+  }
+};
+PROCESSES.cyanotype.order=0; PROCESSES.vandyke.order=1; PROCESSES.salt.order=2; PROCESSES.platinum.order=3; PROCESSES.kallitype.order=4; PROCESSES.gum.order=5; PROCESSES.anthotype.order=6;
+const PROC_IDS = Object.keys(PROCESSES);
+$("procCount").textContent = `${PROC_IDS.length} processes · 1841–1889`;
+
+function variantColors(proc, v, paper){
+  const V = proc.variants[v];
+  if(V.pig){
+    const mid = paper.map((c,i)=> c + (V.pig[i]-c)*0.55);
+    return {mid, deep:V.pig, bronze:V.pig, paperMul:null};
+  }
+  return V;
+}
+
+/* ======================= ENGINE ======================= */
+function hash(ix, iy, s){
+  let h = Math.imul(ix, 374761393) ^ Math.imul(iy, 668265263) ^ Math.imul(s, 982451653);
+  h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+}
+function vnoise(x, y, s){
+  const xi = Math.floor(x), yi = Math.floor(y), fx = x-xi, fy = y-yi;
+  const u = fx*fx*(3-2*fx), v = fy*fy*(3-2*fy);
+  const a = hash(xi,yi,s), b = hash(xi+1,yi,s), c = hash(xi,yi+1,s), d = hash(xi+1,yi+1,s);
+  return a + (b-a)*u + (c-a)*v + (a-b-c+d)*u*v;
+}
+function fbm(x, y, s, oct){ let t=0, amp=0.5, f=1, n=0; for(let i=0;i<oct;i++){ t+=amp*vnoise(x*f,y*f,s+i*31); n+=amp; amp*=0.5; f*=2.03; } return t/n; }
+const smooth = (a,b,x)=>{ const t=Math.min(1,Math.max(0,(x-a)/(b-a))); return t*t*(3-2*t); };
+const lerp = (a,b,t)=>a+(b-a)*t;
+const dimsOf = img => [img.naturalWidth || img.width, img.naturalHeight || img.height];
+
+// light transmission of the film actually placed on the paper (1 = clear)
+function filmTransmission(img, w, h, P, proc){
+  const c = document.createElement("canvas"); c.width=w; c.height=h;
+  const g = c.getContext("2d", {willReadFrequently:true});
+  if(P.flip){ g.translate(w,0); g.scale(-1,1); }
+  g.drawImage(img, 0, 0, w, h);
+  const d = g.getImageData(0,0,w,h).data, out = new Float32Array(w*h);
+  const invert = (proc.needs === "neg") !== (P.input === "neg");
+  for(let i=0,j=0;i<out.length;i++,j+=4){
+    const a = d[j+3]/255;
+    let L = (0.2126*d[j]+0.7152*d[j+1]+0.0722*d[j+2])/255;
+    if(invert) L = 1-L;
+    out[i] = L*a + (1-a);
+  }
+  return out;
+}
+function boxBlur(src, w, h, r){
+  if(r < 0.5) return src;
+  const rad = Math.max(1, Math.round(r)), tmp = new Float32Array(src.length), out = new Float32Array(src.length);
+  const pass = (inp, outp, horiz) => {
+    const len = horiz ? w : h, lines = horiz ? h : w;
+    for(let l=0;l<lines;l++){
+      const idx = k => horiz ? l*w+k : k*w+l; let acc=0;
+      for(let k=-rad;k<=rad;k++) acc += inp[idx(Math.min(len-1,Math.max(0,k)))];
+      for(let k=0;k<len;k++){ outp[idx(k)] = acc/(2*rad+1); acc += inp[idx(Math.min(len-1,k+rad+1))] - inp[idx(Math.max(0,k-rad))]; }
+    }
+  };
+  pass(src,tmp,true); pass(tmp,out,false); pass(out,tmp,true); pass(tmp,out,false);
+  return out;
+}
+function sampleCover(img, W, H){
+  const c = document.createElement("canvas"); c.width=W; c.height=H;
+  const g = c.getContext("2d", {willReadFrequently:true});
+  const [iw, ih] = dimsOf(img), sc = Math.max(W/iw, H/ih);
+  g.drawImage(img, (W-iw*sc)/2, (H-ih*sc)/2, iw*sc, ih*sc);
+  return g.getImageData(0,0,W,H).data;
+}
+
+function renderPrint({img, paperImg, P, longEdge, seed, blank}){
+  const proc = PROCESSES[P.process];
+  const [iw, ih] = dimsOf(img);
+  const bFrac = P.border/100;
+  const negScale = longEdge / (Math.max(iw,ih)*(1+2*bFrac));
+  const nw = Math.max(1, Math.round(iw*negScale)), nh = Math.max(1, Math.round(ih*negScale));
+  const b = Math.round(Math.max(nw,nh)*bFrac), W = nw+2*b, H = nh+2*b;
+  let film = filmTransmission(img, nw, nh, P, proc);
+  film = boxBlur(film, nw, nh, P.soft*longEdge/1100);
+
+  const baseV = proc.variants[P.variant] || Object.values(proc.variants)[0];
+  const paperMul = baseV.paperMul;
+  const paperRef = REF.map((c,i)=> c*(paperMul ? paperMul[i] : 1));
+  const stock = PAPERS[P.paper] || PAPERS.natural;
+  const edgeKind = P.edge || "cut";
+  const C = variantColors(proc, P.variant in proc.variants ? P.variant : Object.keys(proc.variants)[0], paperRef);
+  const stain = paperRef.map((c,i)=> lerp(c, C.mid[i], 0.35));
+  const scan = paperImg ? sampleCover(paperImg, W, H) : null;
+  const paintA = (P.coatMode === "paint" && PAINT.mask) ? PAINT.alphaAt(W, H) : null;
+
+  const L = Math.max(W,H), U = 1000/L;
+  const over = b*(P.coat/100);
+  const cx0=(b-over)*U, cx1=(b+nw+over)*U, cy0=(b-over)*U, cy1=(b+nh+over)*U;
+  const horiz = P.dir === "h", rough = P.rough, gain = Math.pow(2, P.exposure);
+  const k = proc.k, kNorm = 1/(1-Math.exp(-k)), fog = P.fog, edgeBand = 10 + 22*rough;
+  const isPos = proc.needs === "pos";
+  const out = new ImageData(W, H), px = out.data, s = seed;
+  const a0 = horiz?cx0:cy0, a1 = horiz?cx1:cy1, c0 = horiz?cy0:cx0, c1 = horiz?cy1:cx1;
+
+  const Wu = W*U, Hu = H*U;
+  const edgeOff = (along, sd) => edgeKind === "torn"
+      ? 3 + 11*fbm(along*0.02, sd, s+60, 4) + 3*vnoise(along*0.35, sd, s+61)
+      : 2.5 + 3*fbm(along*0.07, sd, s+62, 3) + 1.2*vnoise(along*0.8, sd, s+63);
+  for(let y=0;y<H;y++){
+    const ny = y*U;
+    for(let x=0;x<W;x++){
+      const nx = x*U;
+      let ea = 1, core = 1, thin = 0;
+      if(edgeKind !== "cut"){
+        const de = Math.min(nx - edgeOff(ny, 1.3), (Wu-nx) - edgeOff(ny, 4.7), ny - edgeOff(nx, 7.1), (Hu-ny) - edgeOff(nx, 9.9));
+        if(edgeKind === "torn"){
+          const fibre = vnoise(nx*1.7, ny*1.7, s+64);
+          ea = smooth(-0.6, 0.6, de + (fibre-0.5)*3.2);
+          core = smooth(0.4, 3.2, de + (fibre-0.5)*1.5);   // torn edge shows white paper core
+          thin = 1 - smooth(0, 2.5, de);
+        } else {
+          ea = smooth(-0.5, 0.5, de);
+          thin = 1 - smooth(0, 4, de);                    // deckle feathers thinner toward the edge
+        }
+        if(ea <= 0){ const i4 = (y*W+x)*4; px[i4]=px[i4+1]=px[i4+2]=255; px[i4+3]=0; continue; }
+      }
+      let m;
+      if(paintA){ m = paintA[y*W+x]; } else {
+      const along = horiz?nx:ny, across = horiz?ny:nx;
+      const endL = rough*(18*fbm(across*0.018,1.7,s+11,4) + 5*vnoise(across*0.22,3.1,s+12)*vnoise(across*0.05,4.4,s+18));
+      const endR = rough*(18*fbm(across*0.018,5.3,s+13,4) + 5*vnoise(across*0.22,8.9,s+14)*vnoise(across*0.05,6.6,s+19));
+      const sideT = rough*4*fbm(along*0.015,2.2,s+15,2), sideB = rough*4*fbm(along*0.015,9.4,s+16,2);
+      const dE = Math.min(along-(a0+endL), (a1-endR)-along), dS = Math.min(across-(c0+sideT), (c1-sideB)-across);
+      m = smooth(-1.2, 1.2, Math.min(dE, dS));
+      if(m > 0 && rough > 0 && dE < edgeBand){
+        const t = (1 - dE/edgeBand)*0.75;
+        const streak = 0.65*vnoise(along*0.04, across*0.9, s+17) + 0.35*vnoise(along*0.01, across*0.2, s+20);
+        m *= smooth(t-0.07, t+0.07, streak);
+      }
+      }
+
+      m *= core; if(blank) m = 0;
+      const inNeg = x>=b && x<b+nw && y>=b && y<b+nh;
+      const trans = inNeg ? Math.pow(Math.max(0, film[(y-b)*nw+(x-b)]), P.contrast) : (P.exposeBorder ? 1 : 0);
+      let sens = 1 + P.uneven*((fbm(nx*0.006, ny*0.006, s+21, 3)-0.5)*1.1 + (vnoise(horiz?nx*0.004:nx*0.25, horiz?ny*0.25:ny*0.004, s+22)-0.5)*0.55);
+      sens = Math.max(0.2, sens);
+      const dose = trans*gain*sens;
+      const resp = Math.min(1, (1-Math.exp(-k*dose))*kNorm);
+      let d = isPos ? (1-resp) : resp;
+      d = fog + (1-fog)*d;
+      d *= proc.dmax;
+      if(proc.grain){ d *= 1 + proc.grain*((vnoise(nx*0.9, ny*0.9, s+51)-0.5)*0.35 + (vnoise(nx*0.12, ny*0.12, s+52)-0.5)*0.3); d = Math.max(0, Math.min(1, d)); }
+      d *= m;
+      if(P.speck > 0 && m > 0.5){
+        if(vnoise(nx*0.45, ny*0.45, s+31) > 1 - P.speck*0.035) d *= 0.25;
+        if(vnoise(nx*0.9, ny*0.9, s+33) > 1 - P.speck*0.012) d = Math.max(d, 0.85*proc.dmax);
+      }
+
+      let r,g,bl;
+      if(d < 0.55){
+        const t = d/0.55, e = t*t*(3-2*t)*0.5 + t*0.5;
+        r = lerp(paperRef[0], C.mid[0], e); g = lerp(paperRef[1], C.mid[1], e); bl = lerp(paperRef[2], C.mid[2], e);
+      } else {
+        const t = (d-0.55)/0.45;
+        r = lerp(C.mid[0], C.deep[0], t); g = lerp(C.mid[1], C.deep[1], t); bl = lerp(C.mid[2], C.deep[2], t);
+      }
+      if(proc.bronze && P.bronze > 0){
+        const bz = P.bronze*smooth(1.6, 4.5, dose)*m*0.7;
+        r = lerp(r, C.bronze[0], bz); g = lerp(g, C.bronze[1], bz); bl = lerp(bl, C.bronze[2], bz);
+      }
+      const st = m*(1-m)*0.35;
+      r = lerp(r, stain[0], st); g = lerp(g, stain[1], st); bl = lerp(bl, stain[2], st);
+
+      const i4 = (y*W+x)*4;
+      // emulsion acts as a dye over the paper: base * (colour on reference white / reference white)
+      let br, bg, bb;
+      if(scan){ br = scan[i4]; bg = scan[i4+1]; bb = scan[i4+2]; }
+      else { const tx = surface(stock.tex, nx, ny, s, P.tex); br = stock.rgb[0]*tx; bg = stock.rgb[1]*tx; bb = stock.rgb[2]*tx; }
+      if(thin > 0){ const l = thin*0.12; br += (255-br)*l; bg += (255-bg)*l; bb += (255-bb)*l; }
+      px[i4]   = br*(r/REF[0]);
+      px[i4+1] = bg*(g/REF[1]);
+      px[i4+2] = bb*(bl/REF[2]);
+      px[i4+3] = 255*ea;
+    }
+  }
+  return out;
+}
+
+// the film as it would sit on the paper: dark = dense
+function renderFilm({img, P, longEdge}){
+  const proc = PROCESSES[P.process];
+  const [iw, ih] = dimsOf(img), sc = longEdge/Math.max(iw,ih);
+  const w = Math.round(iw*sc), h = Math.round(ih*sc);
+  const t = filmTransmission(img, w, h, P, proc);
+  const out = new ImageData(w,h);
+  for(let i=0;i<t.length;i++){ const v = Math.pow(t[i], P.contrast)*255; out.data[i*4]=v; out.data[i*4+1]=v; out.data[i*4+2]=v; out.data[i*4+3]=255; }
+  return out;
+}
+function toCanvas(imgData, canvas){
+  canvas = canvas || document.createElement("canvas");
+  canvas.width = imgData.width; canvas.height = imgData.height;
+  canvas.getContext("2d").putImageData(imgData,0,0);
+  return canvas;
+}
+
+/* ======================= STATE ======================= */
+const COMMON = {exposure:0, soft:0.8, fog:0.04, bronze:0.3, paper:"natural", border:14, coat:55, rough:1, uneven:0.45, tex:0.55, speck:0.3, dir:"h", flip:false, exposeBorder:true, coatMode:"auto", edge:"cut"};
+function defaultsFor(id){
+  const p = PROCESSES[id];
+  const extra = id==="gum" ? {speck:0.1, rough:1.3} : id==="anthotype" ? {speck:0.05, fog:0, rough:1.2} : id==="platinum" ? {speck:0.1} : {};
+  return {...COMMON, ...extra, process:id, variant:Object.keys(p.variants)[0], contrast:p.gamma};
+}
+let P = {...defaultsFor("cyanotype"), input:"pos"};
+let seed = 7;
+let exampleImg = null, userImg = null, paperImg = null;
+const srcImg = () => userImg || exampleImg;
+
+/* ======================= INDEX & PROCESS PAGES ======================= */
+function thumbFor(id, longEdge){
+  const p = {...defaultsFor(id), input:P.input};
+  return toCanvas(renderPrint({img:srcImg(), paperImg, P:p, longEdge, seed:7}));
+}
+let buildGen = 0;
+function buildIndex(){
+  const grid = $("procGrid"); grid.innerHTML = "";
+  PROC_IDS.forEach(id=>{
+    const p = PROCESSES[id];
+    const a = document.createElement("a"); a.className="card"; a.href="#"+id;
+    a.innerHTML = `<div class="thumb"></div><div><h3>${p.name}</h3><p>${p.date}</p><p>${p.short}</p></div>`;
+    grid.appendChild(a);
+  });
+  // render thumbs progressively so the page appears immediately
+  let i = 0; const gen = ++buildGen;
+  const step = () => {
+    if(gen !== buildGen || i >= PROC_IDS.length) return;
+    const card = grid.children[i], th = card.querySelector(".thumb"), c = thumbFor(PROC_IDS[i], 520); th.style.aspectRatio = `${c.width} / ${c.height}`; th.appendChild(c);
+    i++; setTimeout(step, 0);
+  };
+  step();
+}
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function showProcess(id){
+  const p = PROCESSES[id], i = PROC_IDS.indexOf(id);
+  const prev = PROC_IDS[(i-1+PROC_IDS.length)%PROC_IDS.length], next = PROC_IDS[(i+1)%PROC_IDS.length];
+  const sec = $("v-process");
+  sec.innerHTML = `
+    <div class="phead">
+      <div class="plate" id="plate"></div>
+      <div>
+        <h1>${esc(p.name)}</h1>
+        <div class="date">${esc(p.date)}</div>
+        <p class="summary">${esc(p.summary)}</p>
+        <dl class="facts">${p.facts.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
+        <a class="btn" href="#tool" data-open="${id}">Open in the tool</a>
+      </div>
+    </div>
+    <div class="pbody">
+      <div><h2>Chemistry</h2><table class="chem">${p.chem.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</table></div>
+      <div><h2>Making a print</h2><ol>${p.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></div>
+      <div><h2>Notes</h2><p>${esc(p.notes)}</p><h2 style="margin-top:28px">Safety</h2><p class="warn">${esc(p.safety)}</p></div>
+    </div>
+    <div class="pnav"><a href="#${prev}">← ${esc(PROCESSES[prev].name)}</a><a href="#index">All processes</a><a href="#${next}">${esc(PROCESSES[next].name)} →</a></div>`;
+  sec.querySelector("[data-open]").addEventListener("click", ()=>{ setProcess(id); });
+  setTimeout(()=>{ const c = thumbFor(id, 900); $("plate").appendChild(c); }, 0);
+}
+
+/* ======================= PROOFER UI ======================= */
+const pCanvas = $("pCanvas"), printCanvas = document.createElement("canvas");
+let view = "print", queued = false;
+const PREVIEW = 1100;
+
+const SL = {exposure:v=>`${v>=0?"+":""}${(+v).toFixed(1)} st`, contrast:v=>`γ ${(+v).toFixed(2)}`, soft:v=>(+v).toFixed(1), fog:v=>`${Math.round(v*100)}%`, bronze:v=>`${Math.round(v*100)}%`, border:v=>`${v}%`, coat:v=>`${v}%`, rough:v=>(+v).toFixed(2), uneven:v=>`${Math.round(v*100)}%`, tex:v=>`${Math.round(v*100)}%`, speck:v=>`${Math.round(v*100)}%`};
+
+function buildProcButtons(){
+  $("procBtns").innerHTML = PROC_IDS.map(id=>`<button type="button" data-p="${id}" aria-pressed="false">${PROCESSES[id].btn || PROCESSES[id].name}</button>`).join("");
+  $("procBtns").querySelectorAll("button").forEach(b=> b.onclick = ()=>{ setProcess(b.dataset.p); });
+}
+function setProcess(id){
+  const keepInput = P.input;
+  P = {...defaultsFor(id), input:keepInput,
+       // keep paper & framing choices across processes
+       paper:P.paper, border:P.border, coat:P.coat, dir:P.dir, flip:P.flip, exposeBorder:P.exposeBorder, coatMode:P.coatMode, edge:P.edge};
+  syncUI(); draw();
+}
+function syncUI(){
+  const proc = PROCESSES[P.process];
+  $("procBtns").querySelectorAll("button").forEach(b=> b.setAttribute("aria-pressed", b.dataset.p===P.process));
+  $("variantLabel").textContent = proc.variantLabel;
+  $("variant").innerHTML = Object.entries(proc.variants).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("");
+  $("variant").value = P.variant;
+  for(const k in SL){ $(k).value = P[k]; $(k+"V").textContent = SL[k](P[k]); }
+  $("bronzeCtl").style.display = proc.bronze ? "" : "none";
+  $("paper").value = P.paper; $("edge").value = P.edge; $("flip").checked = P.flip; $("exposeBorder").checked = P.exposeBorder;
+  $("dirH").setAttribute("aria-pressed", P.dir==="h"); $("dirV").setAttribute("aria-pressed", P.dir==="v");
+  $("cAuto").setAttribute("aria-pressed", P.coatMode==="auto"); $("cPaint").setAttribute("aria-pressed", P.coatMode==="paint");
+  $("inNeg").setAttribute("aria-pressed", P.input==="neg"); $("inPos").setAttribute("aria-pressed", P.input==="pos");
+}
+function draw(){
+  if(queued || !srcImg()) return;
+  queued = true;
+  requestAnimationFrame(()=>{
+    queued = false;
+    const img = srcImg();
+    const pr = renderPrint({img, paperImg, P, longEdge:PREVIEW, seed});
+    toCanvas(pr, printCanvas);
+    if(view === "print"){ toCanvas(pr, pCanvas); }
+    else if(view === "neg"){ toCanvas(renderFilm({img, P, longEdge:PREVIEW}), pCanvas); }
+    else if(view === "obj"){ OBJ.updateTexture(); }
+    else if(view === "paint"){ PAINT.compose(); }
+    const proc = PROCESSES[P.process], [iw,ih] = dimsOf(img);
+    const film = proc.needs === "pos" ? "positive" : "negative";
+    const conv = (proc.needs === "neg") !== (P.input === "neg") ? ` · your ${P.input==="neg"?"negative":"positive"} is inverted to a ${film}` : "";
+    $("pMeta").textContent = `${proc.name} · ${proc.variants[P.variant].label} · ${iw}×${ih}px${conv}`;
+  });
+}
+for(const k in SL){ $(k).addEventListener("input", e=>{ P[k]=parseFloat(e.target.value); $(k+"V").textContent = SL[k](P[k]); draw(); }); }
+$("variant").addEventListener("change", e=>{ P.variant = e.target.value; draw(); });
+$("paper").innerHTML = [["Paper",["natural","bright","cold","warm","japanese","book"]],["Brown & board",["kraft","cardboard"]],["Colored",["sky","rose","ochre","grey"]],["Fabric",["muslin","linen"]]]
+  .map(([g,ids])=>`<optgroup label="${g}">${ids.map(id=>`<option value="${id}">${PAPERS[id].label.replace(/^(Colored|Fabric): /,"")}</option>`).join("")}</optgroup>`).join("");
+$("paper").addEventListener("change", e=>{ P.paper = e.target.value; PAINT.blankKey = null; draw(); });
+$("edge").addEventListener("change", e=>{ P.edge = e.target.value; PAINT.blankKey = null; draw(); });
+["flip","exposeBorder"].forEach(k=> $(k).addEventListener("change", e=>{ P[k]=e.target.checked; draw(); }));
+$("dirH").onclick = ()=>{ P.dir="h"; syncUI(); draw(); };
+$("dirV").onclick = ()=>{ P.dir="v"; syncUI(); draw(); };
+$("inNeg").onclick = ()=>{ P.input="neg"; syncUI(); syncHome(); draw(); };
+$("inPos").onclick = ()=>{ P.input="pos"; syncUI(); syncHome(); draw(); };
+$("reroll").onclick = ()=>{ seed = (seed*7919 + 104729) % 1000003; draw(); };
+$("reset").onclick = ()=> setProcess(P.process);
+function setView(v){
+  view = v;
+  ["Paint","Print","Neg","Obj"].forEach(n=> $("v"+n).setAttribute("aria-pressed", ("v"+n).toLowerCase()==="v"+v));
+  const obj = v==="obj", paint = v==="paint";
+  pCanvas.style.display = (obj||paint) ? "none" : "";
+  $("objWrap").style.display = obj ? "block" : "none";
+  $("paintWrap").style.display = paint ? "flex" : "none";
+  $("easel").classList.toggle("painting", paint);
+  if(paint) PAINT.open();
+  if(obj && !OBJ.init()) { setView("print"); return; }
+  draw();
+}
+$("vPrint").onclick = ()=> setView("print");
+$("vNeg").onclick = ()=> setView("neg");
+$("vObj").onclick = ()=> setView("obj");
+$("vPaint").onclick = ()=> setView("paint");
+
+/* ---------- uploads ---------- */
+function status(msg){ $("pStatus").textContent = msg; }
+function loadImageFile(f, cb){
+  const im = new Image();
+  im.onload = ()=> cb(im);
+  im.onerror = ()=> status("Couldn't read that image. Browsers often can't open TIFF files; export a PNG or JPG instead.");
+  im.src = URL.createObjectURL(f);
+}
+$("fImg").addEventListener("change", e=>{ const f=e.target.files[0]; if(f) loadImageFile(f, im=>{ status(""); setUserImage(im, f.name, null); }); });
+$("fPaper").addEventListener("change", e=>{ const f=e.target.files[0]; if(f) loadImageFile(f, im=>{ paperImg=im; $("paperName").textContent=f.name; $("clrPaper").hidden=false; status(""); draw(); }); });
+$("clrPaper").onclick = ()=>{ paperImg=null; $("paperName").textContent="none"; $("clrPaper").hidden=true; $("fPaper").value=""; draw(); };
+$("fModel").addEventListener("change", e=>{ const f=e.target.files[0]; if(f) OBJ.loadModel(f); });
+const drop = $("drop");
+window.addEventListener("dragover", e=>{ e.preventDefault(); drop.classList.add("on"); });
+window.addEventListener("dragleave", e=>{ if(!e.relatedTarget) drop.classList.remove("on"); });
+window.addEventListener("drop", e=>{
+  e.preventDefault(); drop.classList.remove("on");
+  const f = e.dataTransfer.files[0]; if(!f) return;
+  if(/\.(glb|gltf|obj)$/i.test(f.name)){ if(location.hash !== "#tool") location.hash = "#tool"; setView("obj"); OBJ.loadModel(f); }
+  else if(f.type.startsWith("image/")) loadImageFile(f, im=> setUserImage(im, f.name, (!userImg && location.hash!=="#tool") ? "pos" : null));
+  else status("Drop an image (PNG, JPG) or a 3D model (.glb, .gltf, .obj).");
+});
+
+/* ---------- export ---------- */
+let downloads;
+async function getDownloads(){
+  if(downloads !== undefined) return downloads;
+  try{ downloads = (window.claude && window.claude.use) ? await window.claude.use("downloads") : null; }catch(e){ downloads = null; }
+  return downloads;
+}
+async function savePNG(canvas, name){
+  const blob = await new Promise(r=>canvas.toBlob(r,"image/png"));
+  const dl = await getDownloads();
+  if(!dl){
+    const u = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(u), 60000);
+    status(`Saved ${canvas.width}×${canvas.height}px.`);
+    return;
+  }
+  try{ await dl.save({filename:name, data:blob}); status(`Saved ${canvas.width}×${canvas.height}px.`); }
+  catch(err){ status(err && err.code==="declined" ? "Save cancelled." : "Couldn't save the file. Try again in a moment."); }
+}
+const baseName = ()=> ($("imgName").textContent.replace(/\.[^.]+$/,"").replace(/\s+/g,"-") || "print");
+$("savePrint").onclick = async ()=>{
+  const img = srcImg(), [iw,ih] = dimsOf(img);
+  const L = Math.min(4200, Math.round(Math.max(iw,ih)*(1+2*P.border/100)));
+  status(`Rendering ${L}px print…`); await new Promise(r=>setTimeout(r,30));
+  savePNG(toCanvas(renderPrint({img, paperImg, P, longEdge:L, seed})), `${baseName()}-${P.process}.png`);
+};
+$("saveNeg").onclick = async ()=>{
+  const img = srcImg(), [iw,ih] = dimsOf(img);
+  status("Rendering negative…"); await new Promise(r=>setTimeout(r,30));
+  savePNG(toCanvas(renderFilm({img, P, longEdge:Math.min(6000, Math.max(iw,ih))})), `${baseName()}-${P.process}-digital-${PROCESSES[P.process].needs==="pos"?"positive":"negative"}.png`);
+};
+
+/* ======================= 3D OBJECTS ======================= */
+const OBJ = {
+  ready:false, kind:"sheet", custom:null,
+  init(){
+    if(this.ready) { this.resize(); return true; }
+    if(!window.THREE || !THREE.OrbitControls){ status("The 3D viewer couldn't load. Check your connection and reload."); return false; }
+    const wrap = $("objWrap");
+    this.renderer = new THREE.WebGLRenderer({antialias:true});
+    this.renderer.setPixelRatio(Math.min(2, window.devicePixelRatio||1));
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
+    wrap.insertBefore(this.renderer.domElement, wrap.firstChild);
+    this.scene = new THREE.Scene(); this.scene.background = new THREE.Color(0xffffff);
+    this.camera = new THREE.PerspectiveCamera(35, 1, 0.01, 100); this.camera.position.set(0, 0.4, 5.2);
+    this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement); this.controls.enableDamping = true;
+    this.scene.add(new THREE.HemisphereLight(0xffffff, 0xd9d6cf, 0.75));
+    const key = new THREE.DirectionalLight(0xffffff, 0.75); key.position.set(3,4,5); this.scene.add(key);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(-4,1,-3); this.scene.add(fill);
+    this.tex = new THREE.CanvasTexture(printCanvas); this.tex.encoding = THREE.sRGBEncoding;
+    this.tex.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
+    this.mat = new THREE.MeshStandardMaterial({map:this.tex, roughness:0.88, metalness:0, side:THREE.DoubleSide, transparent:true, alphaTest:0.4});
+    this.group = new THREE.Group(); this.scene.add(this.group);
+    $("objSeg").querySelectorAll("button").forEach(b=> b.onclick = ()=>{ this.custom = null; this.setKind(b.dataset.obj); });
+    window.addEventListener("resize", ()=> this.resize());
+    this.ready = true; this.resize(); this.setKind("sheet");
+    const loop = ()=>{ requestAnimationFrame(loop); if(view==="obj"){ this.controls.update(); this.renderer.render(this.scene, this.camera); } };
+    loop();
+    return true;
+  },
+  resize(){
+    if(!this.ready) return;
+    const r = $("easel").getBoundingClientRect();
+    this.renderer.setSize(r.width, r.height); this.camera.aspect = r.width/r.height; this.camera.updateProjectionMatrix();
+  },
+  updateTexture(){
+    if(!this.ready) return;
+    this.tex.image = printCanvas; this.tex.needsUpdate = true;
+    const asp = printCanvas.width/Math.max(1,printCanvas.height);
+    if(!this.custom && asp !== this.lastAsp){ this.lastAsp = asp; this.setKind(this.kind); }
+  },
+  clear(){ while(this.group.children.length){ const c = this.group.children.pop(); c.traverse(o=>{ if(o.geometry) o.geometry.dispose(); }); } },
+  setKind(kind){
+    this.kind = kind;
+    $("objSeg").querySelectorAll("button").forEach(b=> b.setAttribute("aria-pressed", !this.custom && b.dataset.obj===kind));
+    if(this.custom) return;
+    this.clear();
+    const asp = printCanvas.width/Math.max(1,printCanvas.height);
+    const w = asp>=1 ? 2.6 : 2.6*asp, h = asp>=1 ? 2.6/asp : 2.6;
+    let geo;
+    if(kind==="sheet"){
+      geo = new THREE.PlaneGeometry(w, h, 48, 48);
+      const pos = geo.attributes.position;
+      for(let i=0;i<pos.count;i++){ const x=pos.getX(i), y=pos.getY(i); pos.setZ(i, -0.10*Math.pow(x/w*2,2) + 0.03*Math.sin(y*1.7)); }
+      geo.computeVertexNormals();
+    } else if(kind==="fabric"){
+      geo = new THREE.PlaneGeometry(w, h, 140, 140);
+      const pos = geo.attributes.position;
+      for(let i=0;i<pos.count;i++){ const x=pos.getX(i), y=pos.getY(i);
+        pos.setZ(i, 0.09*Math.sin(x*5.2+y*0.8) + 0.05*Math.sin(y*7.1)*Math.cos(x*2.3) + 0.12*Math.pow(Math.max(0,(h/2-y)/h),2)*Math.sin(x*9)); }
+      geo.computeVertexNormals();
+    } else if(kind==="vase"){
+      const prof = [[0,-1.3],[0.62,-1.3],[0.74,-1.1],[0.86,-0.5],[0.82,0.1],[0.58,0.62],[0.38,0.92],[0.36,1.15],[0.44,1.3]];
+      const curve = new THREE.SplineCurve(prof.map(p=>new THREE.Vector2(p[0],p[1])));
+      geo = new THREE.LatheGeometry(curve.getPoints(90), 160);
+      const uv = geo.attributes.uv; for(let i=0;i<uv.count;i++) uv.setX(i, 1-uv.getX(i));
+    } else if(kind==="sphere"){
+      geo = new THREE.SphereGeometry(1.25, 96, 64);
+    } else {
+      geo = new THREE.BoxGeometry(1.7, 1.7, 1.7);
+    }
+    const mesh = new THREE.Mesh(geo, this.mat);
+    if(kind==="box") mesh.rotation.set(0.35, -0.6, 0);
+    if(kind==="vase") mesh.rotation.y = Math.PI;
+    if(kind==="sphere") mesh.rotation.y = -Math.PI/2;
+    this.group.add(mesh);
+  },
+  loadModel(file){
+    if(!this.init()) return;
+    const ext = file.name.split(".").pop().toLowerCase();
+    const reader = new FileReader();
+    status(`Loading ${file.name}…`);
+    reader.onerror = ()=> status("Couldn't read that file.");
+    reader.onload = ()=>{
+      try{
+        if(ext==="obj"){ this.useModel(new THREE.OBJLoader().parse(reader.result), file.name); }
+        else { new THREE.GLTFLoader().parse(reader.result, "", g=> this.useModel(g.scene, file.name), ()=> status("Couldn't parse that model. Try exporting a single .glb file.")); }
+      }catch(e){ status("Couldn't parse that model. Try exporting a single .glb or .obj file."); }
+    };
+    if(ext==="obj") reader.readAsText(file); else reader.readAsArrayBuffer(file);
+  },
+  useModel(root, name){
+    this.clear(); this.custom = root;
+    const box = new THREE.Box3().setFromObject(root), size = new THREE.Vector3(), ctr = new THREE.Vector3();
+    box.getSize(size); box.getCenter(ctr);
+    const sc = 2.8/Math.max(size.x, size.y, size.z, 1e-6);
+    root.traverse(o=>{
+      if(!o.isMesh) return;
+      const g = o.geometry;
+      if(!g.attributes.uv){
+        // planar projection from the front for models without UVs
+        g.computeBoundingBox(); const bb = g.boundingBox, pos = g.attributes.position, uv = new Float32Array(pos.count*2);
+        const sx = Math.max(1e-6, bb.max.x-bb.min.x), sy = Math.max(1e-6, bb.max.y-bb.min.y);
+        for(let i=0;i<pos.count;i++){ uv[i*2] = (pos.getX(i)-bb.min.x)/sx; uv[i*2+1] = (pos.getY(i)-bb.min.y)/sy; }
+        g.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+      }
+      if(!g.attributes.normal) g.computeVertexNormals();
+      o.material = this.mat;
+    });
+    root.position.sub(ctr.multiplyScalar(sc)); root.scale.setScalar(sc);
+    this.group.add(root);
+    $("objSeg").querySelectorAll("button").forEach(b=> b.setAttribute("aria-pressed", false));
+    $("objNote").textContent = `${name} · drag to orbit · scroll to zoom`;
+    status("");
+  }
+};
+
+/* ======================= HOME UPLOAD ======================= */
+function setUserImage(im, name, input){
+  userImg = im;
+  if(input) P.input = input;
+  $("imgName").textContent = name;
+  $("hName").textContent = `Showing ${name}`;
+  $("hReset").hidden = false;
+  const dz = $("dz"); dz.classList.add("has");
+  dz.querySelectorAll("img").forEach(n=>n.remove());
+  const pv = new Image(); pv.src = im.src; pv.alt = "Your uploaded image"; dz.insertBefore(pv, $("dzT"));
+  $("dzT").textContent = "Replace image"; $("dzS").textContent = name;
+  PAINT.imageChanged();
+  syncHome(); syncUI(); refreshAll();
+}
+function syncHome(){ $("hPos").setAttribute("aria-pressed", P.input==="pos"); $("hNeg").setAttribute("aria-pressed", P.input==="neg"); }
+function refreshAll(){
+  const h = (location.hash||"#index").slice(1);
+  if(h==="index" || !h) buildIndex();
+  else if(h in PROCESSES) showProcess(h);
+  draw();
+}
+$("hImg").addEventListener("change", e=>{ const f=e.target.files[0]; if(f) loadImageFile(f, im=> setUserImage(im, f.name, userImg ? null : "pos")); });
+$("hPos").onclick = ()=>{ P.input="pos"; syncHome(); syncUI(); buildIndex(); draw(); };
+$("hNeg").onclick = ()=>{ P.input="neg"; syncHome(); syncUI(); buildIndex(); draw(); };
+$("hReset").onclick = ()=>{
+  userImg = null; P.input = "pos"; $("imgName").textContent = "example photo"; $("hName").textContent = "Showing the example photo"; $("hReset").hidden = true;
+  const dz = $("dz"); dz.classList.remove("has"); dz.querySelectorAll("img").forEach(n=>n.remove());
+  $("dzT").textContent = "Upload a photo"; $("dzS").textContent = "JPG or PNG · click or drop it here"; $("hImg").value = "";
+  PAINT.imageChanged();
+  syncHome(); syncUI(); buildIndex(); draw();
+};
+["dragenter","dragover"].forEach(ev=> $("dz").addEventListener(ev, ()=> $("dz").classList.add("over")));
+["dragleave","drop"].forEach(ev=> $("dz").addEventListener(ev, ()=> $("dz").classList.remove("over")));
+
+/* ======================= PAINT THE COATING ======================= */
+function paperGeom(img, P, longEdge){
+  const [iw, ih] = dimsOf(img), bFrac = P.border/100;
+  const negScale = longEdge / (Math.max(iw,ih)*(1+2*bFrac));
+  const nw = Math.max(1, Math.round(iw*negScale)), nh = Math.max(1, Math.round(ih*negScale));
+  const b = Math.round(Math.max(nw,nh)*bFrac);
+  return {W:nw+2*b, H:nh+2*b, b, nw, nh};
+}
+const PAINT = {
+  mask:null, tool:"flat", undo:[], canvas:$("paintCanvas"), stroke:null, queued:false,
+  open(){
+    const g = paperGeom(srcImg(), P, PREVIEW);
+    const c = this.canvas;
+    if(c.width !== g.W || c.height !== g.H){ c.width = g.W; c.height = g.H; }
+    if(!this.mask){ this.mask = document.createElement("canvas"); this.mask.width = g.W; this.mask.height = g.H; }
+    else if(this.mask.width !== g.W || this.mask.height !== g.H){
+      const n = document.createElement("canvas"); n.width = g.W; n.height = g.H;
+      n.getContext("2d").drawImage(this.mask, 0, 0, g.W, g.H); this.mask = n; this.undo = [];
+    }
+    this.geom = g; this.compose();
+  },
+  sensColor(){
+    const proc = PROCESSES[P.process];
+    if(proc.sens) return proc.sens;
+    const v = proc.variants[P.variant];
+    return v.pig ? v.pig.map((c,i)=> Math.round(c*0.75 + [210,150,40][i]*0.25)) : [200,200,90];
+  },
+  compose(){
+    if(!this.mask || !this.geom) return;
+    const ng = paperGeom(srcImg(), P, PREVIEW);
+    if(ng.W !== this.geom.W || ng.H !== this.geom.H){ this.open(); return; }
+    const c = this.canvas, g = c.getContext("2d"), {W,H,b,nw,nh} = this.geom;
+    g.globalCompositeOperation = "source-over"; g.globalAlpha = 1;
+    g.clearRect(0,0,W,H);
+    const key = [W,H,P.paper,P.edge,P.tex,seed,!!paperImg,paperImg&&paperImg.src].join("|");
+    if(this.blankKey !== key){
+      const blankP = {...P, coatMode:"auto"};
+      this.blank = toCanvas(renderPrint({img:srcImg(), paperImg, P:blankP, longEdge:PREVIEW, seed, blank:true}));
+      this.blankKey = key;
+    }
+    g.drawImage(this.blank, 0, 0, W, H);
+    // sensitizer wash, tinted through the mask
+    if(!this.tint){ this.tint = document.createElement("canvas"); }
+    this.tint.width = W; this.tint.height = H;
+    const tg = this.tint.getContext("2d");
+    tg.fillStyle = `rgb(${this.sensColor()})`; tg.fillRect(0,0,W,H);
+    tg.globalCompositeOperation = "destination-in"; tg.drawImage(this.mask, 0, 0);
+    tg.drawImage(this.blank, 0, 0, W, H);   // keep the coat inside the paper's edge
+    g.globalAlpha = 0.85; g.drawImage(this.tint, 0, 0); g.globalAlpha = 1;
+    // ghost of the image and the negative's footprint
+    g.save(); g.globalAlpha = 0.16;
+    if(P.flip){ g.translate(b+nw, b); g.scale(-1,1); g.drawImage(srcImg(), 0, 0, nw, nh); } else g.drawImage(srcImg(), b, b, nw, nh);
+    g.restore();
+  },
+  queueCompose(){ if(this.queued) return; this.queued = true; requestAnimationFrame(()=>{ this.queued = false; this.compose(); }); },
+  alphaAt(W, H){
+    if(!this.cache || this.cache.w !== W || this.cache.h !== H || this.cache.ver !== this.ver){
+      const c = document.createElement("canvas"); c.width = W; c.height = H;
+      const g = c.getContext("2d", {willReadFrequently:true}); g.drawImage(this.mask, 0, 0, W, H);
+      const d = g.getImageData(0,0,W,H).data, a = new Float32Array(W*H);
+      for(let i=0;i<a.length;i++) a[i] = d[i*4+3]/255;
+      this.cache = {w:W, h:H, ver:this.ver, a};
+    }
+    return this.cache.a;
+  },
+  ver:0,
+  // a new image has a different shape: start a fresh coat rather than stretching the old one
+  imageChanged(){
+    this.mask = null; this.undo = []; this.ver++; this.cache = null; this.blankKey = null; this.geom = null;
+    if(P.coatMode === "paint"){ P.coatMode = "auto"; syncUI(); }
+    if(view === "paint") this.open();
+  },
+  pos(e){ const r = this.canvas.getBoundingClientRect(); return [(e.clientX-r.left)*this.canvas.width/r.width, (e.clientY-r.top)*this.canvas.height/r.height]; },
+  begin(e){
+    const mg = this.mask.getContext("2d");
+    this.undo.push(mg.getImageData(0,0,this.mask.width,this.mask.height)); if(this.undo.length > 20) this.undo.shift();
+    const size = +$("bSize").value * this.canvas.width/1100;
+    const n = Math.max(10, Math.min(90, Math.round(size/2.2)));
+    const load = +$("bLoad").value;
+    const bristles = [];
+    for(let i=0;i<n;i++) bristles.push({off:(i/(n-1)-0.5)*size + (Math.random()-0.5)*size/n, a:0.72+Math.random()*0.28, paint:1, decay:(0.4+Math.random()*1.2)/(load*load*2600), r:size/n*(1.5+Math.random()*1.1)});
+    const [x,y] = this.pos(e);
+    this.stroke = {x, y, dx:1, dy:0, size, bristles, travelled:0};
+    this.dab(x, y, 0, true);
+  },
+  move(e){
+    if(!this.stroke) return;
+    const [x,y] = this.pos(e), s = this.stroke;
+    const dx = x-s.x, dy = y-s.y, dist = Math.hypot(dx,dy);
+    if(dist < 0.5) return;
+    const ux = dx/dist, uy = dy/dist;
+    // ease the brush angle so the flat brush turns like a real one
+    s.dx = s.dx*0.7 + ux*0.3; s.dy = s.dy*0.7 + uy*0.3;
+    const steps = Math.ceil(dist/1.2);
+    for(let i=1;i<=steps;i++) this.dab(s.x + dx*i/steps, s.y + dy*i/steps, dist/steps, false);
+    s.x = x; s.y = y; this.ver++; this.queueCompose();
+  },
+  dab(x, y, step, first){
+    const s = this.stroke, g = this.mask.getContext("2d"), flow = +$("bFlow").value;
+    g.globalCompositeOperation = this.tool === "erase" ? "destination-out" : "source-over";
+    if(this.tool === "round" || this.tool === "erase"){
+      const r = s.size/2, grd = g.createRadialGradient(x,y,0,x,y,r);
+      const a = this.tool === "erase" ? 0.5 : flow*0.12;
+      grd.addColorStop(0, `rgba(0,0,0,${a})`); grd.addColorStop(0.7, `rgba(0,0,0,${a*0.8})`); grd.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = grd; g.beginPath(); g.arc(x, y, r, 0, Math.PI*2); g.fill();
+      return;
+    }
+    // flat hake brush: a row of bristles across the stroke direction
+    const len = Math.hypot(s.dx, s.dy) || 1, px = -s.dy/len, py = s.dx/len;
+    for(const br of s.bristles){
+      if(br.paint <= 0) continue;
+      const a = flow*br.a*Math.min(1, br.paint*1.6)*0.5;
+      g.fillStyle = `rgba(0,0,0,${a})`;
+      const bx = x + px*br.off, by = y + py*br.off;
+      g.fillRect(bx - br.r/2, by - br.r/2, br.r, br.r);
+      br.paint -= br.decay*step;
+    }
+  },
+  end(){ if(!this.stroke) return; this.stroke = null; this.ver++; P.coatMode = "paint"; syncUI(); }
+};
+(()=>{
+  const c = PAINT.canvas;
+  c.addEventListener("pointerdown", e=>{ if(!PAINT.mask) return; c.setPointerCapture(e.pointerId); PAINT.begin(e); PAINT.compose(); });
+  c.addEventListener("pointermove", e=> PAINT.move(e));
+  ["pointerup","pointercancel"].forEach(ev=> c.addEventListener(ev, ()=> PAINT.end()));
+  const tools = {bFlat:"flat", bRound:"round", bErase:"erase"};
+  Object.keys(tools).forEach(id=> $(id).onclick = ()=>{ PAINT.tool = tools[id]; Object.keys(tools).forEach(k=> $(k).setAttribute("aria-pressed", k===id)); });
+  const fmt = {bSize:v=>`${v}`, bLoad:v=>`${Math.round(v*100)}%`, bFlow:v=>`${Math.round(v*100)}%`};
+  Object.keys(fmt).forEach(id=>{ const upd = ()=> $(id+"V").textContent = fmt[id]($(id).value); $(id).addEventListener("input", upd); upd(); });
+  $("bUndo").onclick = ()=>{ const s = PAINT.undo.pop(); if(s){ PAINT.mask.getContext("2d").putImageData(s,0,0); PAINT.ver++; PAINT.compose(); } };
+  $("bClear").onclick = ()=>{ const m = PAINT.mask; if(!m) return; PAINT.undo.push(m.getContext("2d").getImageData(0,0,m.width,m.height)); m.getContext("2d").clearRect(0,0,m.width,m.height); PAINT.ver++; PAINT.compose(); };
+  $("bExpose").onclick = ()=>{ P.coatMode = "paint"; syncUI(); setView("print"); };
+  window.addEventListener("keydown", e=>{ if(view==="paint" && (e.metaKey||e.ctrlKey) && e.key.toLowerCase()==="z"){ e.preventDefault(); $("bUndo").click(); } });
+  $("cAuto").onclick = ()=>{ P.coatMode = "auto"; syncUI(); draw(); };
+  $("cPaint").onclick = ()=>{ P.coatMode = "paint"; syncUI(); if(!PAINT.mask || PAINT.ver===0) setView("paint"); else draw(); };
+})();
+
+/* ======================= ROUTER ======================= */
+function route(){
+  const h = (location.hash || "#index").slice(1);
+  const isProc = h in PROCESSES;
+  const alias = {proofer:"tool", negatives:"tool"};
+  const want = alias[h] || h;
+  const viewId = isProc ? "process" : (["index","tool"].includes(want) ? want : "index");
+  document.querySelectorAll("section.view").forEach(s=> s.classList.toggle("on", s.id==="v-"+viewId));
+  document.querySelectorAll("nav.site a").forEach(a=>{
+    const on = a.dataset.nav === viewId || (isProc && a.dataset.nav==="index");
+    if(on) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current");
+  });
+  if(isProc) showProcess(h);
+  if(viewId === "tool"){ syncUI(); draw(); if(view==="obj") OBJ.resize(); }
+  if(h === "negatives") setTimeout(()=> $("negs").scrollIntoView(), 50); else window.scrollTo(0,0);
+}
+window.addEventListener("hashchange", route);
+
+/* ======================= START ======================= */
+buildProcButtons();
+exampleImg = new Image();
+exampleImg.onload = ()=>{ buildIndex(); route(); };
+exampleImg.src = EXAMPLE;
+</script>
+</body>
+</html>
