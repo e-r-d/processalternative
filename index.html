@@ -166,6 +166,10 @@ select{width:100%;background:var(--paper);color:var(--ink);border:1px solid var(
 .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:40px;margin-top:8px}
 .cols h3{font-size:18px;border-top:1px solid var(--rule);padding-top:10px;margin-bottom:8px}
 .cols p{margin:0;font-size:16px;max-width:60ch}
+.adslot{margin:0 32px;padding:20px 0 28px;border-top:1px solid var(--rule);text-align:center}
+.adslot[hidden]{display:none}
+.adlabel{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--grey);margin-bottom:8px}
+#adbox{min-height:90px;max-width:970px;margin:0 auto}
 footer.site{border-top:1px solid var(--rule);padding:16px 32px 40px;font-size:13px;color:var(--grey);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 footer.site a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--hair)}
 footer.site a:hover{border-bottom-color:var(--ink)}
@@ -181,6 +185,20 @@ footer.site .fnote{flex-basis:100%;margin:8px 0 0;font-size:12px}
   .easel{min-height:420px;padding:20px}
   header.site{padding:22px 20px;flex-direction:column;gap:16px}
   section.view{padding:0 16px 72px}
+}
+/* phone: compact header, and keep the print pinned in view while the controls scroll */
+@media (max-width:900px){
+  header.site{flex-direction:row!important;padding:10px 16px!important;gap:12px}
+  .wordmark img{height:52px!important;width:52px!important}
+  nav.site{gap:20px}
+  .stage.pin{position:sticky;top:var(--hh,74px);z-index:12;background:var(--paper);border-bottom:1px solid var(--rule);box-shadow:0 6px 12px -10px rgba(0,0,0,.25)}
+  .stage.pin .stagebar{padding:8px 12px;gap:8px;flex-wrap:nowrap}
+  .stage.pin .stagebar .meta{display:none}
+  .stage.pin .stagebar .seg{flex:1 1 auto;min-width:0}
+  .stage.pin .stagebar .seg button{padding:6px 4px;font-size:13px}
+  .stage.pin .dlicon{width:36px;height:36px}
+  .stage.pin .easel{min-height:0;padding:10px 12px 12px}
+  .stage.pin #pCanvas{max-height:34svh}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
@@ -287,7 +305,7 @@ footer.site .fnote{flex-basis:100%;margin:8px 0 0;font-size:12px}
       </div>
     </aside>
 
-    <div class="stage">
+    <div class="stage pin">
       <div class="stagebar">
         <div class="seg" role="group" aria-label="View"><button id="vPaint" type="button" aria-pressed="false">Paint coating</button><button id="vPrint" type="button" aria-pressed="true">Print</button><button id="vNeg" type="button" aria-pressed="false">Negative</button><button id="vObj" type="button" aria-pressed="false">On object</button></div>
         <div class="meta" id="pMeta"></div>
@@ -346,6 +364,8 @@ footer.site .fnote{flex-basis:100%;margin:8px 0 0;font-size:12px}
 </section>
 
 
+<aside class="adslot" id="adslot" hidden aria-label="Advertisement"><span class="adlabel">Advertisement</span><div id="adbox"></div></aside>
+
 <footer class="site">
   <div class="reading"><b>Process Alternative Inc.</b><span>New York, NY</span><span>© 2026 Process Alternative Inc.</span><span class="contact"><a href="mailto:contact@processalternative.com" title="contact@processalternative.com"><b>Contact</b></a></span></div>
   <div class="reading" style="text-align:right"><b>Reading</b><span><em>The Book of Alternative Photographic Processes</em>, Christopher James. The standard reference, with formulas and history for nearly every process here.</span></div>
@@ -355,6 +375,32 @@ footer.site .fnote{flex-basis:100%;margin:8px 0 0;font-size:12px}
 
 <script>
 const EXAMPLE = "example.webp";
+function setHH(){ const h=document.querySelector("header.site"); if(h) document.documentElement.style.setProperty("--hh", h.offsetHeight+"px"); }
+window.addEventListener("resize", setHH); window.addEventListener("load", setHH); setHH();
+/* ---------- marketing: fill these in to switch on ---------- */
+const META_PIXEL_ID  = "";   // Meta Events Manager → Pixel ID (digits)
+const ADSENSE_CLIENT = "";   // "ca-pub-XXXXXXXXXXXXXXXX"
+const ADSENSE_SLOT   = "";   // display ad unit slot id (digits)
+function track(name, data){ try{ if(window.fbq) fbq("trackCustom", name, data||{}); }catch(e){} }
+(function initMarketing(){
+  if(META_PIXEL_ID){
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");
+    fbq("init", META_PIXEL_ID); fbq("track", "PageView");
+  }
+  if(ADSENSE_CLIENT && ADSENSE_SLOT){
+    const sc = document.createElement("script"); sc.async = true; sc.crossOrigin = "anonymous";
+    sc.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + ADSENSE_CLIENT;
+    document.head.appendChild(sc);
+    const ins = document.createElement("ins"); ins.className = "adsbygoogle"; ins.style.display = "block";
+    ins.setAttribute("data-ad-client", ADSENSE_CLIENT); ins.setAttribute("data-ad-slot", ADSENSE_SLOT);
+    ins.setAttribute("data-ad-format", "horizontal"); ins.setAttribute("data-full-width-responsive", "true");
+    document.getElementById("adbox").appendChild(ins);
+    document.getElementById("adslot").hidden = false;
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  }
+})();
 const $ = id => document.getElementById(id);
 
 /* ======================= PROCESS DATA ======================= */
@@ -901,6 +947,7 @@ function setView(v){
   $("objWrap").style.display = obj ? "block" : "none";
   $("paintWrap").style.display = paint ? "flex" : "none";
   $("easel").classList.toggle("painting", paint);
+  document.querySelector(".stage").classList.toggle("pin", !(obj||paint));
   if(paint) PAINT.open();
   if(obj && !OBJ.init()) { setView("print"); return; }
   draw();
@@ -997,6 +1044,7 @@ async function getDownloads(){
   return downloads;
 }
 async function savePNG(canvas, name){
+  track("Download", {file: name});
   let blob;
   if(/\.jpe?g$/i.test(name)){
     // JPG has no transparency: put torn or deckled edges on white
@@ -1064,8 +1112,43 @@ const OBJ = {
   updateTexture(){
     if(!this.ready) return;
     this.tex.image = printCanvas; this.tex.needsUpdate = true;
+    if(this.kind==="sphere" || this.kind==="box") this.paintBacked();
     const asp = printCanvas.width/Math.max(1,printCanvas.height);
     if(!this.custom && asp !== this.lastAsp){ this.lastAsp = asp; this.setKind(this.kind); }
+  },
+  paperCss(){ const pp = PAPERS[P.paper]; const c = (pp && pp.rgb) || [244,240,229]; return `rgb(${c[0]},${c[1]},${c[2]})`; },
+  // print laid on paper, so torn or deckled edges show paper instead of holes
+  paintBacked(){
+    const pw = printCanvas.width, ph = printCanvas.height, asp = pw/Math.max(1,ph), col = this.paperCss();
+    if(!this.boxCanvas){
+      this.boxCanvas = document.createElement("canvas"); this.sphCanvas = document.createElement("canvas");
+      this.sphCanvas.width = 4096; this.sphCanvas.height = 2048;
+      this.boxTex = new THREE.CanvasTexture(this.boxCanvas); this.sphTex = new THREE.CanvasTexture(this.sphCanvas);
+      [this.boxTex, this.sphTex].forEach(t=>{ t.encoding = THREE.sRGBEncoding; t.anisotropy = this.renderer.capabilities.getMaxAnisotropy(); });
+    }
+    if(this.boxCanvas.width !== pw || this.boxCanvas.height !== ph){
+      this.boxCanvas.width = pw; this.boxCanvas.height = ph;
+      this.boxTex.dispose(); this.boxTex = new THREE.CanvasTexture(this.boxCanvas);
+      this.boxTex.encoding = THREE.sRGBEncoding; this.boxTex.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
+    }
+    let g = this.boxCanvas.getContext("2d");
+    g.fillStyle = col; g.fillRect(0,0,pw,ph); g.drawImage(printCanvas,0,0);
+    this.boxTex.needsUpdate = true;
+    if(this.sideMat) this.sideMat.color.set(col).convertSRGBToLinear();
+    // equirectangular map: 1 px = the same angle both ways, so the print keeps its proportions on the sphere's face
+    const S = this.sphCanvas, sw = S.width, sh = S.height;
+    // keep the print within ~85° x 70° of the sphere's face, and widen each row by 1/cos(latitude)
+    // so it sits on the ball like a flat sheet instead of pinching toward the poles
+    let dh = sh*0.39, dw = dh*asp;
+    if(dw > sw*0.24){ dw = sw*0.24; dh = dw/asp; }
+    g = S.getContext("2d"); g.fillStyle = col; g.fillRect(0,0,sw,sh);
+    const top = (sh-dh)/2, step = 2;
+    for(let y=0; y<dh; y+=step){
+      const lat = ((top+y+step/2)/sh - 0.5)*Math.PI;
+      const rw = dw/Math.max(0.2, Math.cos(lat));
+      g.drawImage(printCanvas, 0, y/dh*ph, pw, step/dh*ph, (sw-rw)/2, top+y, rw, step+0.5);
+    }
+    this.sphTex.needsUpdate = true;
   },
   clear(){ while(this.group.children.length){ const c = this.group.children.pop(); c.traverse(o=>{ if(o.geometry) o.geometry.dispose(); }); } },
   setKind(kind){
@@ -1095,9 +1178,17 @@ const OBJ = {
     } else if(kind==="sphere"){
       geo = new THREE.SphereGeometry(1.25, 96, 64);
     } else {
-      geo = new THREE.BoxGeometry(1.7, 1.7, 1.7);
+      // a mounted block: the print's own proportions on the front, paper on the sides and back
+      geo = new THREE.BoxGeometry(w*0.78, h*0.78, 0.42);
     }
-    const mesh = new THREE.Mesh(geo, this.mat);
+    let mat = this.mat;
+    if(kind==="sphere" || kind==="box"){
+      this.paintBacked();
+      const side = this.sideMat = new THREE.MeshStandardMaterial({color:new THREE.Color(this.paperCss()).convertSRGBToLinear(), roughness:0.92, metalness:0});
+      const face = new THREE.MeshStandardMaterial({map: kind==="sphere" ? this.sphTex : this.boxTex, roughness:0.88, metalness:0});
+      mat = kind==="sphere" ? face : [side, side, side, side, face, side];
+    }
+    const mesh = new THREE.Mesh(geo, mat);
     if(kind==="box") mesh.rotation.set(0.35, -0.6, 0);
     if(kind==="vase") mesh.rotation.y = Math.PI;
     if(kind==="sphere") mesh.rotation.y = -Math.PI/2;
@@ -1145,7 +1236,7 @@ const OBJ = {
 
 /* ======================= HOME UPLOAD ======================= */
 function setUserImage(im, name, input){
-  userImg = im;
+  userImg = im; track("Upload");
   if(input) P.input = input;
   $("imgName").textContent = name;
   $("hName").textContent = `Showing ${name}`;
